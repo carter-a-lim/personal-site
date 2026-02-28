@@ -49,3 +49,15 @@ jobs:
           publish_dir: ./dist
           publish_branch: gh-pages
           force_orphan: true
+
+      - name: Show deployed URL
+        shell: bash
+        run: |
+          if [ "${{ github.event.repository.name }}" = "${{ github.repository_owner }}.github.io" ]; then
+            SITE_URL="https://${{ github.repository_owner }}.github.io/"
+          else
+            SITE_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          fi
+          echo "Deployed site: $SITE_URL"
+          echo "### Deployed site" >> "$GITHUB_STEP_SUMMARY"
+          echo "$SITE_URL" >> "$GITHUB_STEP_SUMMARY"
