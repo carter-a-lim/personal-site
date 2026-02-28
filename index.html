@@ -360,11 +360,36 @@
       }
       .sidequests-panel .quest-photo {
         height: 150px;
-        background:
+        color: transparent;
+        text-indent: -9999px;
+        overflow: hidden;
+        background-position: center;
+        background-size: 100% 100%, 100% 100%, contain !important;
+        background-repeat: no-repeat;
+        background-color: rgba(2, 10, 22, 0.92);
+        background-image:
           linear-gradient(130deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 140, 0.18)),
           radial-gradient(circle at 75% 20%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 50%),
           repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0) 2px, rgba(255, 255, 255, 0) 7px);
         border: 1px solid rgba(116, 235, 255, 0.5);
+      }
+      .sidequests-panel .quest-pop:nth-child(1) .quest-photo {
+        background-image:
+          linear-gradient(130deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 140, 0.18)),
+          repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0) 2px, rgba(255, 255, 255, 0) 7px),
+          url('/signal-2026-02-27-164119.jpeg');
+      }
+      .sidequests-panel .quest-pop:nth-child(2) .quest-photo {
+        background-image:
+          linear-gradient(130deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 140, 0.18)),
+          repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0) 2px, rgba(255, 255, 255, 0) 7px),
+          url('/IMG_0508.jpg');
+      }
+      .sidequests-panel .quest-pop:nth-child(3) .quest-photo {
+        background-image:
+          linear-gradient(130deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 140, 0.18)),
+          repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0) 2px, rgba(255, 255, 255, 0) 7px),
+          url('/IMG_6904.jpg');
       }
       .sidequests-panel .section-label {
         margin-bottom: 0.8rem !important;
@@ -451,11 +476,15 @@
       body.sidequests-active .canvas-normal,
       body.sidequests-active .canvas-blur {
         transform: translate3d(
-          calc(var(--mx, 0) * -14px),
-          calc(var(--my, 0) * -10px),
+          calc(var(--mx, 0) * -20px),
+          calc(var(--my, 0) * -14px),
           0
-        ) scale(1.02);
-        transition: transform 100ms linear;
+        ) scale(1.03) rotateX(calc(var(--my, 0) * -1.2deg)) rotateY(calc(var(--mx, 0) * 1.6deg)) !important;
+        transform-origin: 50% 58% !important;
+        transition: transform 80ms linear !important;
+        position: fixed !important;
+        inset: 0;
+        z-index: 4 !important;
         will-change: transform;
       }
       body.sidequests-active .sidequests-panel {
@@ -730,6 +759,54 @@
       const fill = document.getElementById('boot-fill');
       const label = document.getElementById('boot-label');
       const bootStart = document.getElementById('boot-start');
+      const initGlobalPointerParallaxVars = () => {
+        if (window.__globalParallaxVarsInit) return;
+        window.__globalParallaxVarsInit = true;
+        let currentX = 0;
+        let currentY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        let rafId = 0;
+        const applyVars = () => {
+          currentX += (targetX - currentX) * 0.2;
+          currentY += (targetY - currentY) * 0.2;
+          const x = currentX.toFixed(4);
+          const y = currentY.toFixed(4);
+          document.documentElement.style.setProperty('--mx', x);
+          document.documentElement.style.setProperty('--my', y);
+          document.body.style.setProperty('--mx', x);
+          document.body.style.setProperty('--my', y);
+          if (Math.abs(targetX - currentX) < 0.001 && Math.abs(targetY - currentY) < 0.001) {
+            rafId = 0;
+            return;
+          }
+          rafId = requestAnimationFrame(applyVars);
+        };
+        const queueApply = () => {
+          if (rafId) return;
+          rafId = requestAnimationFrame(applyVars);
+        };
+        window.addEventListener(
+          'pointermove',
+          (event) => {
+            targetX = (event.clientX / window.innerWidth) * 2 - 1;
+            targetY = -((event.clientY / window.innerHeight) * 2 - 1);
+            queueApply();
+          },
+          { passive: true }
+        );
+        window.addEventListener(
+          'pointerleave',
+          () => {
+            targetX = 0;
+            targetY = 0;
+            queueApply();
+          },
+          { passive: true }
+        );
+        queueApply();
+      };
+      initGlobalPointerParallaxVars();
       const updateUiScale = () => {
         const baseWidth = 1920;
         const baseHeight = 1080;
