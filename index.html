@@ -833,10 +833,10 @@
           };
         };
 
-        const playTechHoverSfx = createPolySfxPlayer('/mixkit-arcade-mechanical-bling-210.wav', 0.45, 10, 0.1);
-        const playTransitionSfxInstance = createPolySfxPlayer('/mixkit-machine-activation-short-3180.wav', 0.52, 8);
-        const playProfileExperienceSwipeSfx = createPolySfxPlayer('/mixkit-fast-swipe-zoom-2627.wav', 0.5, 8);
-        const playExperienceHoverSfx = createPolySfxPlayer('/mixkit-sci-fi-positive-notification-266.wav', 0.42, 10, 0.25);
+        const playTechHoverSfx = createPolySfxPlayer('mixkit-arcade-mechanical-bling-210.wav', 0.45, 10, 0.1);
+        const playTransitionSfxInstance = createPolySfxPlayer('mixkit-machine-activation-short-3180.wav', 0.52, 8);
+        const playProfileExperienceSwipeSfx = createPolySfxPlayer('mixkit-fast-swipe-zoom-2627.wav', 0.5, 8);
+        const playExperienceHoverSfx = createPolySfxPlayer('mixkit-sci-fi-positive-notification-266.wav', 0.42, 10, 0.25);
 
         let lastTechHover = '';
         document.addEventListener(
@@ -1012,7 +1012,7 @@
         await new Promise((resolve) => {
           const script = document.createElement('script');
           script.type = 'module';
-          script.src = '/app-runtime.js';
+          script.src = 'app-runtime.js';
           script.onload = resolve;
           script.onerror = (error) => {
             console.error('[boot] Failed to load app-runtime.js in skip mode', error);
@@ -1209,7 +1209,7 @@
           document.body.appendChild(script);
         });
       let runtimeLoaded = false;
-      const runtimeUrl = `/app-runtime.js?boot=${Date.now()}`;
+      const runtimeUrl = `app-runtime.js?boot=${Date.now()}`;
       try {
         await loadRuntimeScript(runtimeUrl, 12000);
         runtimeLoaded = true;
@@ -1217,7 +1217,7 @@
         console.error('[boot] Script injection failed for app-runtime.js', runtimeLoadError);
       }
       if (!runtimeLoaded) {
-        const fallbackUrl = `/app-runtime.js?boot-fallback=${Date.now()}`;
+        const fallbackUrl = `app-runtime.js?boot-fallback=${Date.now()}`;
         try {
           await import(/* @vite-ignore */ fallbackUrl);
           runtimeLoaded = true;
@@ -1273,7 +1273,7 @@
         };
       };
 
-      const playTechHoverSfx = createPolySfxPlayer('/mixkit-arcade-mechanical-bling-210.wav', 0.45, 10, 0.1);
+      const playTechHoverSfx = createPolySfxPlayer('mixkit-arcade-mechanical-bling-210.wav', 0.45, 10, 0.1);
       let lastTechHover = '';
       document.addEventListener(
         'pointerover',
@@ -1293,9 +1293,9 @@
       );
 
       // Scene transition SFX (black/red wipe transition and section changes).
-      const playTransitionSfxInstance = createPolySfxPlayer('/mixkit-machine-activation-short-3180.wav', 0.52, 8);
-      const playProfileExperienceSwipeSfx = createPolySfxPlayer('/mixkit-fast-swipe-zoom-2627.wav', 0.5, 8);
-      const playExperienceHoverSfx = createPolySfxPlayer('/mixkit-sci-fi-positive-notification-266.wav', 0.42, 10, 0.25);
+      const playTransitionSfxInstance = createPolySfxPlayer('mixkit-machine-activation-short-3180.wav', 0.52, 8);
+      const playProfileExperienceSwipeSfx = createPolySfxPlayer('mixkit-fast-swipe-zoom-2627.wav', 0.5, 8);
+      const playExperienceHoverSfx = createPolySfxPlayer('mixkit-sci-fi-positive-notification-266.wav', 0.42, 10, 0.25);
       let lastTransitionSfxAt = 0;
       const playTransitionSfx = () => {
         const now = performance.now();
