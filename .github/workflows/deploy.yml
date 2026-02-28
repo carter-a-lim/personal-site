@@ -36,7 +36,7 @@ jobs:
           if [ "${{ github.event.repository.name }}" = "${{ github.repository_owner }}.github.io" ]; then
             echo "value=/" >> "$GITHUB_OUTPUT"
           else
-            echo "value=/${{ github.event.repository.name }}/" >> "$GITHUB_OUTPUT"
+            echo "value=/personal-site/" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build
