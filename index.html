@@ -7,6 +7,15 @@
     <title>personal-website</title>
     <link rel="stylesheet" href="/app-runtime.css" />
     <style>
+      :root {
+        --ui-scale: 1;
+      }
+      html {
+        font-size: calc(16px * var(--ui-scale));
+      }
+      body {
+        min-width: 320px;
+      }
       #boot-loader {
         position: fixed;
         inset: 0;
@@ -712,6 +721,18 @@
       const fill = document.getElementById('boot-fill');
       const label = document.getElementById('boot-label');
       const bootStart = document.getElementById('boot-start');
+      const updateUiScale = () => {
+        const baseWidth = 1920;
+        const baseHeight = 1080;
+        const widthScale = window.innerWidth / baseWidth;
+        const heightScale = window.innerHeight / baseHeight;
+        const rawScale = Math.min(widthScale, heightScale);
+        const clampedScale = Math.max(0.72, Math.min(rawScale, 1.12));
+        document.documentElement.style.setProperty('--ui-scale', clampedScale.toFixed(4));
+      };
+      updateUiScale();
+      window.addEventListener('resize', updateUiScale, { passive: true });
+      window.addEventListener('orientationchange', updateUiScale);
       const initSoundEffects = () => {
         if (window.__bootSfxInit) return;
         window.__bootSfxInit = true;
