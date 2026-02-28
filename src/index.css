@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: 'Cyberpunk';
-  src: url('fonts/Cyberpunk-Regular.ttf') format('truetype');
+  src: url('/cyberpunk-2077/Cyberpunk-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
