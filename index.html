@@ -465,31 +465,13 @@
         opacity: 0 !important;
         visibility: hidden !important;
       }
-      /* Side Quests camera-style parallax: move only 3D scene, keep UI static */
+      /* Canvas layers stay fixed; camera movement is handled in runtime. */
       .canvas-normal,
       .canvas-blur {
         transform: translate3d(0, 0, 0);
         opacity: 1;
         transition: opacity 320ms ease;
-        will-change: opacity, transform;
-      }
-      body.sidequests-active .canvas-normal,
-      body.sidequests-active .canvas-blur {
-        transform: translate3d(
-          calc(var(--mx, 0) * -20px),
-          calc(var(--my, 0) * -14px),
-          0
-        ) scale(1.03) rotateX(calc(var(--my, 0) * -1.2deg)) rotateY(calc(var(--mx, 0) * 1.6deg)) !important;
-        transform-origin: 50% 58% !important;
-        transition: transform 80ms linear !important;
-        position: fixed !important;
-        inset: 0;
-        z-index: 4 !important;
-        will-change: transform;
-      }
-      body.sidequests-active .sidequests-panel {
-        --mx: 0 !important;
-        --my: 0 !important;
+        will-change: opacity;
       }
 
       /* Contact scene: fade to white into rotated Pinterest video (no 3D zoom). */
@@ -903,12 +885,41 @@
           return ((active?.textContent || '').trim() || '').toUpperCase();
         };
         const normalizeNavLabel = (value) => (value || '').replace(/\s+/g, '').toUpperCase();
+        const normalizedText = (value) => (value || '').replace(/\s+/g, ' ').trim();
+        const enforceSidequestsContent = () => {
+          const sidequestsPanel = document.querySelector('.sidequests-panel');
+          if (!(sidequestsPanel instanceof HTMLElement)) return;
+          const cards = Array.from(sidequestsPanel.querySelectorAll('.quest-card'));
+          cards.forEach((card) => {
+            if (!(card instanceof HTMLElement)) return;
+            const titleEl = card.querySelector('h4');
+            const bodyEl = card.querySelector('p');
+            if (!(titleEl instanceof HTMLElement) || !(bodyEl instanceof HTMLElement)) return;
+            const title = normalizeNavLabel(titleEl.textContent || '');
+            let nextText = '';
+            if (title.includes('PITCH')) {
+              nextText =
+                "Won Cal Poly's 2025 Elevator Pitch for Communicare; delivered a 90-second AI startup pitch and earned $1,000 seed funding.";
+            } else if (title.includes('CLASH')) {
+              nextText =
+                "Led Cal Poly's first 2v2 tournament (12 teams, 30+ attendees); ran ops, marketing, and live tech fixes end-to-end.";
+            } else if (title.includes('MUSTANG')) {
+              nextText =
+                'Built and launched with a 3-person team in 2 weeks; reached 3,000+ visitors and 500+ users in 10 days; drove 50,000+ social views.';
+            }
+            if (!nextText) return;
+            if (normalizedText(bodyEl.textContent) === normalizedText(nextText)) return;
+            bodyEl.textContent = nextText;
+          });
+        };
         const syncContactVideoState = (hintLabel = '') => {
           const hinted = normalizeNavLabel(hintLabel);
           const active = document.querySelector('.nav-tags a[data-active="true"]');
           const activeLabel = hinted || normalizeNavLabel((active?.textContent || '').trim());
+          const sidequestsVisible = activeLabel === 'SIDEQUESTS' || !!document.querySelector('.sidequests-panel.visible');
           const panelVisible = !!document.querySelector('.contact-panel.visible');
           const shouldShowVideo = activeLabel === 'CONTACT' || panelVisible;
+          document.body.classList.toggle('sidequests-active', sidequestsVisible && !shouldShowVideo);
           document.body.classList.toggle('contact-lock', shouldShowVideo);
           document.body.classList.toggle('contact-active', shouldShowVideo);
           if (contactVideo instanceof HTMLVideoElement) {
@@ -950,6 +961,20 @@
           attributeFilter: ['class', 'data-active'],
           childList: true,
         });
+        let sidequestSyncQueued = false;
+        const queueSidequestContentSync = () => {
+          if (sidequestSyncQueued) return;
+          sidequestSyncQueued = true;
+          requestAnimationFrame(() => {
+            sidequestSyncQueued = false;
+            enforceSidequestsContent();
+          });
+        };
+        const sidequestContentObserver = new MutationObserver(() => queueSidequestContentSync());
+        sidequestContentObserver.observe(document.body, {
+          subtree: true,
+          childList: true,
+        });
         document.addEventListener(
           'click',
           (event) => {
@@ -961,6 +986,7 @@
           },
           true
         );
+        queueSidequestContentSync();
         syncContactVideoState();
 
         let lastExperienceHover = null;
@@ -1431,52 +1457,36 @@
       };
       enableDragScroll('.timeline-feed, .timeline-sideprojects, .sideproject-list, .profile-tech-side');
 
-      // One-time heavy scene/shader warmup, now run during boot before user interaction.
-      const runSceneWarmup = async (targetLabel) => {
+      // One-pass scene warmup: load each section once so first user transition is already compiled.
+      const runSceneWarmup = async () => {
         if (hasSceneWarmupRun || isRunningSceneWarmup) return;
         isRunningSceneWarmup = true;
         sceneWarmupOverlay?.classList.add('visible');
-        const heavyPass = [
-          ['HOME', '.hero-text', 260],
-          ['PROFILE', '.profile-panel.visible', 380],
-          ['EXPERIENCE', '.timeline-panel.visible', 380],
-          ['SIDE QUESTS', '.sidequests-panel.visible', 620],
-          ['CONTACT', '.contact-panel.visible', 320],
+        const sequence = [
+          ['HOME', '.hero-text', 180, 10],
+          ['PROFILE', '.profile-panel.visible', 240, 14],
+          ['EXPERIENCE', '.timeline-panel.visible', 240, 14],
+          ['SIDE QUESTS', '.sidequests-panel.visible', 320, 18],
+          ['CONTACT', '.contact-panel.visible', 220, 12],
+          ['HOME', '.hero-text', 160, 10],
         ];
-        const refinePass = [
-          ['PROFILE', '.profile-panel.visible', 120],
-          ['EXPERIENCE', '.timeline-panel.visible', 120],
-          ['SIDE QUESTS', '.sidequests-panel.visible', 200],
-          ['CONTACT', '.contact-panel.visible', 140],
-          ['HOME', '.hero-text', 80],
-        ];
-        const totalSteps = heavyPass.length + refinePass.length + 2;
+        const totalSteps = sequence.length + 1;
         let stepIndex = 0;
         const setWarmupStep = (text) => {
           stepIndex += 1;
-          label.textContent = `Scene preload ${stepIndex}/${totalSteps}: ${text}`;
+          if (label) {
+            label.textContent = `Scene preload ${stepIndex}/${totalSteps}: ${text}`;
+          }
         };
         try {
-          for (const [labelText, visibleSelector, settleMs] of heavyPass) {
-            setWarmupStep(`Compiling ${labelText}`);
+          for (const [labelText, visibleSelector, settleMs, frameCount] of sequence) {
+            setWarmupStep(`Warming ${labelText}`);
             clickNav(labelText);
             await waitFor(visibleSelector, 2200);
-            await waitFrames(22);
-            await sleep(settleMs);
-          }
-          // Second fast pass helps avoid first-hit jitters from deferred shader/material work.
-          for (const [labelText, visibleSelector, settleMs] of refinePass) {
-            setWarmupStep(`Refining ${labelText}`);
-            clickNav(labelText);
-            await waitFor(visibleSelector, 1800);
-            await waitFrames(10);
+            await waitFrames(frameCount);
             await sleep(settleMs);
           }
           setWarmupStep('Finalizing cache');
-          clickNav(targetLabel || 'HOME');
-          await waitFrames(16);
-          await sleep(160);
-          setWarmupStep('Complete');
           hasSceneWarmupRun = true;
         } finally {
           isRunningSceneWarmup = false;
@@ -1485,31 +1495,20 @@
       };
 
       const startIntroAndWaitReady = async () => {
-        // Sections only transition after intro phase reaches "done".
-        const enterBtn = await waitFor('.intro-enter', 12000);
+        // Runtime can already be interactive; only drive intro if it's still visible.
+        const nav = await waitFor('.nav-tags', 1200);
+        if (nav) {
+          await waitFrames(6);
+          return;
+        }
+        const enterBtn = await waitFor('.intro-enter', 9000);
         if (enterBtn instanceof HTMLElement) {
           enterBtn.click();
         }
+        await waitFor('.nav-tags', 7000);
         await waitUntil(() => !document.querySelector('.intro-overlay'), 5000, 40);
-        await waitFor('.nav-tags', 4000);
         await waitFrames(10);
       };
-      document.addEventListener(
-        'click',
-        (event) => {
-          const target = event.target;
-          if (!(target instanceof Element)) return;
-          if (hasSceneWarmupRun || isRunningSceneWarmup) return;
-          const navLink = target.closest('.nav-tags a');
-          if (!navLink) return;
-          if (document.querySelector('.intro-overlay')) return;
-          const navText = (navLink.textContent || '').trim();
-          event.preventDefault();
-          event.stopPropagation();
-          runSceneWarmup(navText);
-        },
-        true
-      );
 
       // Scene atmosphere toggles.
       const syncSceneAtmosphere = () => {
@@ -1578,10 +1577,10 @@
 
       if (!DISABLE_PRELOAD) {
         if (label) {
-          label.textContent = 'Preparing scene graph...';
+          label.textContent = 'Warming scene transitions...';
         }
         await startIntroAndWaitReady();
-        await runSceneWarmup('HOME');
+        await runSceneWarmup();
       }
       if (label) {
         label.textContent = 'Ready. Click START to enter.';
