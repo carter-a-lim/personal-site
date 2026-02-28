@@ -449,11 +449,11 @@
       #contact-video-scene {
         position: fixed;
         inset: 0;
-        z-index: 10;
+        z-index: 60;
         pointer-events: none;
         opacity: 0;
         background: #000;
-        transition: opacity 420ms ease;
+        transition: opacity 90ms linear;
         overflow: hidden;
         will-change: opacity;
       }
@@ -468,15 +468,22 @@
         object-fit: cover;
         filter: brightness(0.9) contrast(1.08);
       }
-      body.contact-active #contact-video-scene {
+      body.contact-active #contact-video-scene,
+      body.contact-lock #contact-video-scene {
         opacity: 1;
       }
       body.contact-active .canvas-normal,
       body.contact-active .canvas-blur,
+      body.contact-lock .canvas-normal,
+      body.contact-lock .canvas-blur,
       body.contact-active .cyber-city,
+      body.contact-lock .cyber-city,
       body.contact-active .cyber-environment::before,
-      body.contact-active .cyber-environment::after {
+      body.contact-lock .cyber-environment::before,
+      body.contact-active .cyber-environment::after,
+      body.contact-lock .cyber-environment::after {
         opacity: 0 !important;
+        visibility: hidden !important;
       }
       /* Contact readability: boost UI contrast over bright video */
       body.contact-active .hud,
@@ -705,6 +712,167 @@
       const fill = document.getElementById('boot-fill');
       const label = document.getElementById('boot-label');
       const bootStart = document.getElementById('boot-start');
+      const initSoundEffects = () => {
+        if (window.__bootSfxInit) return;
+        window.__bootSfxInit = true;
+
+        const createPolySfxPlayer = (src, volume = 0.5, maxVoices = 8, startAtSec = 0) => {
+          const seed = new Audio(src);
+          seed.preload = 'auto';
+          seed.volume = volume;
+          const voices = new Set();
+          return () => {
+            try {
+              if (voices.size >= maxVoices) return;
+              const voice = seed.cloneNode(true);
+              voice.volume = volume;
+              voices.add(voice);
+              const clear = () => voices.delete(voice);
+              voice.addEventListener('ended', clear, { once: true });
+              voice.addEventListener('error', clear, { once: true });
+              if (startAtSec > 0) {
+                const jump = () => {
+                  try {
+                    voice.currentTime = startAtSec;
+                  } catch (_) {}
+                };
+                if (voice.readyState >= 1) jump();
+                else voice.addEventListener('loadedmetadata', jump, { once: true });
+              }
+              void voice.play().catch(clear);
+            } catch (_) {}
+          };
+        };
+
+        const playTechHoverSfx = createPolySfxPlayer('/mixkit-arcade-mechanical-bling-210.wav', 0.45, 10, 0.1);
+        const playTransitionSfxInstance = createPolySfxPlayer('/mixkit-machine-activation-short-3180.wav', 0.52, 8);
+        const playProfileExperienceSwipeSfx = createPolySfxPlayer('/mixkit-fast-swipe-zoom-2627.wav', 0.5, 8);
+        const playExperienceHoverSfx = createPolySfxPlayer('/mixkit-sci-fi-positive-notification-266.wav', 0.42, 10, 0.25);
+
+        let lastTechHover = '';
+        document.addEventListener(
+          'pointerover',
+          (event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+            const tag = target.closest('.tech-tag');
+            if (!tag) return;
+            const profilePanel = document.querySelector('.profile-panel.visible');
+            if (!profilePanel || !profilePanel.contains(tag)) return;
+            const text = (tag.textContent || '').trim();
+            if (!text || text === lastTechHover) return;
+            lastTechHover = text;
+            playTechHoverSfx();
+          },
+          { passive: true }
+        );
+
+        let lastTransitionSfxAt = 0;
+        const playTransitionSfx = () => {
+          const now = performance.now();
+          if (now - lastTransitionSfxAt < 180) return;
+          lastTransitionSfxAt = now;
+          playTransitionSfxInstance();
+        };
+        const transitionObserver = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.type !== 'attributes') continue;
+            const target = mutation.target;
+            if (!(target instanceof Element)) continue;
+            if (target.matches('.impact-frame.flash, .wipe-band.animate')) {
+              playTransitionSfx();
+              return;
+            }
+          }
+        });
+        transitionObserver.observe(document.body, {
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['class'],
+        });
+
+        const getActiveNavLabel = () => {
+          const active = document.querySelector('.nav-tags a[data-active="true"]');
+          return ((active?.textContent || '').trim() || '').toUpperCase();
+        };
+        const normalizeNavLabel = (value) => (value || '').replace(/\s+/g, '').toUpperCase();
+        const syncContactVideoState = (hintLabel = '') => {
+          const hinted = normalizeNavLabel(hintLabel);
+          const active = document.querySelector('.nav-tags a[data-active="true"]');
+          const activeLabel = hinted || normalizeNavLabel((active?.textContent || '').trim());
+          const panelVisible = !!document.querySelector('.contact-panel.visible');
+          const shouldShowVideo = activeLabel === 'CONTACT' || panelVisible;
+          document.body.classList.toggle('contact-lock', shouldShowVideo);
+          document.body.classList.toggle('contact-active', shouldShowVideo);
+          if (contactVideo instanceof HTMLVideoElement) {
+            if (shouldShowVideo) {
+              void contactVideo.play().catch(() => {});
+            } else {
+              contactVideo.pause();
+            }
+          }
+        };
+        let lastActiveNav = getActiveNavLabel();
+        const navObserver = new MutationObserver(() => {
+          const current = getActiveNavLabel();
+          if (!current || current === lastActiveNav) return;
+          const profileToExperience = lastActiveNav === 'PROFILE' && current === 'EXPERIENCE';
+          const experienceToProfile = lastActiveNav === 'EXPERIENCE' && current === 'PROFILE';
+          if (profileToExperience || experienceToProfile) {
+            playProfileExperienceSwipeSfx();
+          }
+          if (current === 'CONTACT' && lastActiveNav !== 'CONTACT') {
+            if (contactFlashOverlay) {
+              contactFlashOverlay.classList.remove('active');
+              void contactFlashOverlay.offsetWidth;
+              contactFlashOverlay.classList.add('active');
+            }
+          }
+          syncContactVideoState(current);
+          lastActiveNav = current;
+        });
+        navObserver.observe(document.body, {
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['data-active'],
+        });
+        const contactStateObserver = new MutationObserver(() => syncContactVideoState());
+        contactStateObserver.observe(document.body, {
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['class', 'data-active'],
+          childList: true,
+        });
+        document.addEventListener(
+          'click',
+          (event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+            const navLink = target.closest('.nav-tags a');
+            if (!navLink) return;
+            syncContactVideoState(navLink.textContent || '');
+          },
+          true
+        );
+        syncContactVideoState();
+
+        let lastExperienceHover = null;
+        document.addEventListener(
+          'pointerover',
+          (event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+            const timelinePanel = document.querySelector('.timeline-panel.visible');
+            if (!timelinePanel) return;
+            const hoverItem = target.closest('.event-card, .timeline-kpi, .timeline-link-btn, .data-shard-btn, .sideproject-card');
+            if (!hoverItem || !timelinePanel.contains(hoverItem)) return;
+            if (hoverItem === lastExperienceHover) return;
+            lastExperienceHover = hoverItem;
+            playExperienceHoverSfx();
+          },
+          { passive: true }
+        );
+      };
       if (SKIP_BOOT_SCREEN) {
         if (loader) loader.remove();
         if (sceneWarmupOverlay) sceneWarmupOverlay.remove();
@@ -719,6 +887,7 @@
           };
           document.body.appendChild(script);
         });
+        initSoundEffects();
         return;
       }
       let contactVideoPauseTimer = null;
@@ -1050,6 +1219,7 @@
         if (current === 'CONTACT' && lastActiveNav !== 'CONTACT') {
           triggerContactTransitionFx();
         }
+        document.body.classList.toggle('contact-lock', current === 'CONTACT');
         lastActiveNav = current;
       });
       navObserver.observe(document.body, {
@@ -1057,6 +1227,22 @@
         attributes: true,
         attributeFilter: ['data-active'],
       });
+      document.addEventListener(
+        'click',
+        (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          const navLink = target.closest('.nav-tags a');
+          if (!navLink) return;
+          const navText = (navLink.textContent || '').trim().toUpperCase();
+          const lockingContact = navText === 'CONTACT';
+          document.body.classList.toggle('contact-lock', lockingContact);
+          if (lockingContact && contactVideo instanceof HTMLVideoElement) {
+            void contactVideo.play().catch(() => {});
+          }
+        },
+        true
+      );
 
       // Fallback cleanup: ensure critical banner class is removed after 3s.
       const criticalObserver = new MutationObserver(() => {
@@ -1221,7 +1407,7 @@
       // Scene atmosphere toggles.
       const syncSceneAtmosphere = () => {
         const onSidequests = !!document.querySelector('.sidequests-panel.visible');
-        const onContact = !!document.querySelector('.contact-panel.visible');
+        const onContact = !!document.querySelector('.contact-panel.visible') || document.body.classList.contains('contact-lock');
         document.body.classList.toggle('sidequests-active', onSidequests);
         document.body.classList.toggle('contact-active', onContact);
         const contactPanel = document.querySelector('.contact-panel');
