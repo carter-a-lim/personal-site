@@ -654,977 +654,232 @@
     </div>
     <div id="boot-loader">
       <div id="boot-card">
-        <h1 id="boot-title">INITIALIZING CITY FEED</h1>
-        <p id="boot-hint">Use headphones for best experience.</p>
+        <h1 id="boot-title">PRELOADING ASSETS</h1>
+        <p id="boot-hint">Preparing files for a smooth first run.</p>
         <div id="boot-track"><div id="boot-fill"></div></div>
         <p id="boot-label">Loading assets... 0%</p>
         <button id="boot-start" type="button">START</button>
       </div>
     </div>
     <script type="module">
-      (async () => {
-      const ASSETS = [
-        'app-runtime.css?v=cp2077-font-1',
-        'cyberpunk-2077/Cyberpunk-Regular.ttf',
-        'app-runtime.js',
-        'Cyberpunk_ Edgerunners  I Really Want to Stay At Your House by Rosa Walton  Netflix.mp3',
-        'mixkit-arcade-mechanical-bling-210.wav',
-        'mixkit-fast-swipe-zoom-2627.wav',
-        'mixkit-machine-activation-short-3180.wav',
-        'mixkit-sci-fi-positive-notification-266.wav',
-        'contact-pinterest.mp4',
-        'tech-icons/antigravity.svg',
-        'tech-icons/canva.svg',
-        'tech-icons/chrome-debug-console.svg',
-        'tech-icons/codex.svg',
-        'tech-icons/css.svg',
-        'tech-icons/figma.svg',
-        'tech-icons/firebase.svg',
-        'tech-icons/framer-motion.svg',
-        'tech-icons/gemini.svg',
-        'tech-icons/git.svg',
-        'tech-icons/google-cloud.svg',
-        'tech-icons/groq.svg',
-        'tech-icons/html.svg',
-        'tech-icons/javascript.svg',
-        'tech-icons/nextjs.svg',
-        'tech-icons/nodejs.svg',
-        'tech-icons/openai.svg',
-        'tech-icons/python.svg',
-        'tech-icons/react.svg',
-        'tech-icons/supabase.svg',
-        'tech-icons/tailwindcss.svg',
-        'tech-icons/typescript.svg',
-        'tech-icons/vite.svg',
+      (() => {
+        const loader = document.getElementById('boot-loader');
+        const fill = document.getElementById('boot-fill');
+        const label = document.getElementById('boot-label');
+        const hint = document.getElementById('boot-hint');
+        const startButton = document.getElementById('boot-start');
+        const contactVideo = document.getElementById('contact-video');
 
-        'cyberpunk_apartment/scene.gltf',
-        'cyberpunk_apartment/scene.bin',
-        'cyberpunk_apartment/textures/bed_sheet_baseColor.png',
-        'cyberpunk_apartment/textures/Wall_paint_metallicRoughness.png',
-        'cyberpunk_apartment/textures/Wall_paint_normal.png',
-        'cyberpunk_apartment/textures/wall_texture_baseColor.png',
-        'cyberpunk_apartment/textures/weather_baseColor.png',
+        if (startButton instanceof HTMLElement) {
+          startButton.remove();
+        }
 
-        'sidequests/city/scene.gltf',
-        'sidequests/city/scene.bin',
-        'sidequests/city/textures/advertising_screens_texture_01_baseColor.jpeg',
-        'sidequests/city/textures/advertising_screens_texture_01_metallicRoughness.png',
-        'sidequests/city/textures/advertising_screens_texture_01_normal.jpeg',
-        'sidequests/city/textures/Material.001_baseColor.jpeg',
-        'sidequests/city/textures/Material.002_baseColor.jpeg',
-        'sidequests/city/textures/Material.003_baseColor.jpeg',
-        'sidequests/city/textures/Material.003_metallicRoughness.png',
-        'sidequests/city/textures/Material.004_baseColor.jpeg',
-        'sidequests/city/textures/Material.005_baseColor.jpeg',
-        'sidequests/city/textures/Material.007_baseColor.jpeg',
-        'sidequests/city/textures/Material.008_baseColor.jpeg',
-        'sidequests/city/textures/Material.009_baseColor.jpeg',
+        const MANIFEST_PATH = 'asset-manifest.json';
+        const RUNTIME_PATH = 'app-runtime.js';
+        const CONCURRENCY = 8;
 
-        'sidequests/car/scene.gltf',
-        'sidequests/car/scene.bin',
-        'sidequests/car/textures/main_paint_normal.png',
-        'sidequests/car/textures/material_0_baseColor.png',
-        'sidequests/car/textures/material_0_emissive.png',
-        'sidequests/car/textures/material_baseColor.jpeg',
-        'sidequests/car/textures/material_metallicRoughness.png',
-        'sidequests/car/textures/Model001_Material001.001_baseColor.png',
-        'sidequests/car/textures/Model001_Material001.001_normal.png',
-        'sidequests/car/textures/Model001_Material004.001_baseColor.png',
-        'sidequests/car/textures/Model001_Material004.001_normal.png',
-        'sidequests/car/textures/wire_008008136_baseColor.jpeg',
-        'sidequests/car/textures/wire_008008136_normal.jpeg',
-      ];
-      const DISABLE_PRELOAD = true;
-      const SKIP_BOOT_SCREEN = true;
-
-      const loader = document.getElementById('boot-loader');
-      const sceneWarmupOverlay = document.getElementById('scene-warmup-overlay');
-      const contactFlashOverlay = document.getElementById('contact-flash-overlay');
-      const contactVideo = document.getElementById('contact-video');
-      const fill = document.getElementById('boot-fill');
-      const label = document.getElementById('boot-label');
-      const bootStart = document.getElementById('boot-start');
-      const initGlobalPointerParallaxVars = () => {
-        if (window.__globalParallaxVarsInit) return;
-        window.__globalParallaxVarsInit = true;
-        let currentX = 0;
-        let currentY = 0;
-        let targetX = 0;
-        let targetY = 0;
-        let rafId = 0;
-        const applyVars = () => {
-          currentX += (targetX - currentX) * 0.2;
-          currentY += (targetY - currentY) * 0.2;
-          const x = currentX.toFixed(4);
-          const y = currentY.toFixed(4);
-          document.documentElement.style.setProperty('--mx', x);
-          document.documentElement.style.setProperty('--my', y);
-          document.body.style.setProperty('--mx', x);
-          document.body.style.setProperty('--my', y);
-          if (Math.abs(targetX - currentX) < 0.001 && Math.abs(targetY - currentY) < 0.001) {
-            rafId = 0;
-            return;
+        const setProgress = (done, total, message) => {
+          if (fill instanceof HTMLElement) {
+            const pct = total > 0 ? Math.min(100, Math.round((done / total) * 100)) : 100;
+            fill.style.width = `${pct}%`;
           }
-          rafId = requestAnimationFrame(applyVars);
-        };
-        const queueApply = () => {
-          if (rafId) return;
-          rafId = requestAnimationFrame(applyVars);
-        };
-        window.addEventListener(
-          'pointermove',
-          (event) => {
-            targetX = (event.clientX / window.innerWidth) * 2 - 1;
-            targetY = -((event.clientY / window.innerHeight) * 2 - 1);
-            queueApply();
-          },
-          { passive: true }
-        );
-        window.addEventListener(
-          'pointerleave',
-          () => {
-            targetX = 0;
-            targetY = 0;
-            queueApply();
-          },
-          { passive: true }
-        );
-        queueApply();
-      };
-      initGlobalPointerParallaxVars();
-      const updateUiScale = () => {
-        const baseWidth = 1920;
-        const baseHeight = 1080;
-        const widthScale = window.innerWidth / baseWidth;
-        const heightScale = window.innerHeight / baseHeight;
-        const rawScale = Math.min(widthScale, heightScale);
-        const clampedScale = Math.max(0.72, Math.min(rawScale, 1.12));
-        document.documentElement.style.setProperty('--ui-scale', clampedScale.toFixed(4));
-      };
-      updateUiScale();
-      window.addEventListener('resize', updateUiScale, { passive: true });
-      window.addEventListener('orientationchange', updateUiScale);
-      const initSoundEffects = () => {
-        if (window.__bootSfxInit) return;
-        window.__bootSfxInit = true;
-
-        const createPolySfxPlayer = (src, volume = 0.5, maxVoices = 8, startAtSec = 0) => {
-          const seed = new Audio(src);
-          seed.preload = 'auto';
-          seed.volume = volume;
-          const voices = new Set();
-          return () => {
-            try {
-              if (voices.size >= maxVoices) return;
-              const voice = seed.cloneNode(true);
-              voice.volume = volume;
-              voices.add(voice);
-              const clear = () => voices.delete(voice);
-              voice.addEventListener('ended', clear, { once: true });
-              voice.addEventListener('error', clear, { once: true });
-              if (startAtSec > 0) {
-                const jump = () => {
-                  try {
-                    voice.currentTime = startAtSec;
-                  } catch (_) {}
-                };
-                if (voice.readyState >= 1) jump();
-                else voice.addEventListener('loadedmetadata', jump, { once: true });
-              }
-              void voice.play().catch(clear);
-            } catch (_) {}
-          };
-        };
-
-        const playTechHoverSfx = createPolySfxPlayer('mixkit-arcade-mechanical-bling-210.wav', 0.45, 10, 0.1);
-        const playTransitionSfxInstance = createPolySfxPlayer('mixkit-machine-activation-short-3180.wav', 0.52, 8);
-        const playProfileExperienceSwipeSfx = createPolySfxPlayer('mixkit-fast-swipe-zoom-2627.wav', 0.5, 8);
-        const playExperienceHoverSfx = createPolySfxPlayer('mixkit-sci-fi-positive-notification-266.wav', 0.42, 10, 0.25);
-
-        let lastTechHover = '';
-        document.addEventListener(
-          'pointerover',
-          (event) => {
-            const target = event.target;
-            if (!(target instanceof Element)) return;
-            const tag = target.closest('.tech-tag');
-            if (!tag) return;
-            const profilePanel = document.querySelector('.profile-panel.visible');
-            if (!profilePanel || !profilePanel.contains(tag)) return;
-            const text = (tag.textContent || '').trim();
-            if (!text || text === lastTechHover) return;
-            lastTechHover = text;
-            playTechHoverSfx();
-          },
-          { passive: true }
-        );
-
-        let lastTransitionSfxAt = 0;
-        const playTransitionSfx = () => {
-          const now = performance.now();
-          if (now - lastTransitionSfxAt < 180) return;
-          lastTransitionSfxAt = now;
-          playTransitionSfxInstance();
-        };
-        const transitionObserver = new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            if (mutation.type !== 'attributes') continue;
-            const target = mutation.target;
-            if (!(target instanceof Element)) continue;
-            if (target.matches('.impact-frame.flash, .wipe-band.animate')) {
-              playTransitionSfx();
-              return;
-            }
+          if (label instanceof HTMLElement && message) {
+            label.textContent = message;
           }
-        });
-        transitionObserver.observe(document.body, {
-          subtree: true,
-          attributes: true,
-          attributeFilter: ['class'],
-        });
-
-        const getActiveNavLabel = () => {
-          const active = document.querySelector('.nav-tags a[data-active="true"]');
-          return ((active?.textContent || '').trim() || '').toUpperCase();
         };
-        const normalizeNavLabel = (value) => (value || '').replace(/\s+/g, '').toUpperCase();
-        const normalizedText = (value) => (value || '').replace(/\s+/g, ' ').trim();
-        const enforceSidequestsContent = () => {
-          const sidequestsPanel = document.querySelector('.sidequests-panel');
-          if (!(sidequestsPanel instanceof HTMLElement)) return;
-          const cards = Array.from(sidequestsPanel.querySelectorAll('.quest-card'));
-          cards.forEach((card) => {
-            if (!(card instanceof HTMLElement)) return;
-            const titleEl = card.querySelector('h4');
-            const bodyEl = card.querySelector('p');
-            if (!(titleEl instanceof HTMLElement) || !(bodyEl instanceof HTMLElement)) return;
-            const title = normalizeNavLabel(titleEl.textContent || '');
-            let nextText = '';
-            if (title.includes('PITCH')) {
-              nextText =
-                "Won Cal Poly's 2025 Elevator Pitch for Communicare; delivered a 90-second AI startup pitch and earned $1,000 seed funding.";
-            } else if (title.includes('CLASH')) {
-              nextText =
-                "Led Cal Poly's first 2v2 tournament (12 teams, 30+ attendees); ran ops, marketing, and live tech fixes end-to-end.";
-            } else if (title.includes('MUSTANG')) {
-              nextText =
-                'Built and launched with a 3-person team in 2 weeks; reached 3,000+ visitors and 500+ users in 10 days; drove 50,000+ social views.';
-            }
-            if (!nextText) return;
-            if (normalizedText(bodyEl.textContent) === normalizedText(nextText)) return;
-            bodyEl.textContent = nextText;
+
+        const loadRuntime = () =>
+          new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = RUNTIME_PATH;
+            script.onload = () => resolve();
+            script.onerror = (event) => reject(event);
+            document.body.appendChild(script);
           });
-        };
-        const syncContactVideoState = (hintLabel = '') => {
-          const hinted = normalizeNavLabel(hintLabel);
-          const active = document.querySelector('.nav-tags a[data-active="true"]');
-          const activeLabel = hinted || normalizeNavLabel((active?.textContent || '').trim());
-          const sidequestsVisible = activeLabel === 'SIDEQUESTS' || !!document.querySelector('.sidequests-panel.visible');
-          const panelVisible = !!document.querySelector('.contact-panel.visible');
-          const shouldShowVideo = activeLabel === 'CONTACT' || panelVisible;
-          document.body.classList.toggle('sidequests-active', sidequestsVisible && !shouldShowVideo);
-          document.body.classList.toggle('contact-lock', shouldShowVideo);
-          document.body.classList.toggle('contact-active', shouldShowVideo);
+
+        const toAssetUrl = (assetPath) => encodeURI(assetPath);
+
+        const normalizeLabel = (value) => String(value || '').replace(/\s+/g, '').toUpperCase();
+
+        const syncSceneClasses = () => {
+          const activeNav = document.querySelector('.nav-tags a[data-active="true"]');
+          const activeLabel = normalizeLabel(activeNav?.textContent || '');
+          const contactPanelVisible = !!document.querySelector('.contact-panel.visible');
+          const sidequestsPanelVisible = !!document.querySelector('.sidequests-panel.visible');
+          const onContact = activeLabel === 'CONTACT' || contactPanelVisible;
+          const onSidequests = activeLabel === 'SIDEQUESTS' || sidequestsPanelVisible;
+
+          document.body.classList.toggle('contact-active', onContact);
+          document.body.classList.toggle('contact-lock', onContact);
+          document.body.classList.toggle('sidequests-active', onSidequests && !onContact);
+
           if (contactVideo instanceof HTMLVideoElement) {
-            if (shouldShowVideo) {
+            if (onContact) {
               void contactVideo.play().catch(() => {});
             } else {
               contactVideo.pause();
             }
           }
         };
-        let lastActiveNav = getActiveNavLabel();
-        const navObserver = new MutationObserver(() => {
-          const current = getActiveNavLabel();
-          if (!current || current === lastActiveNav) return;
-          const profileToExperience = lastActiveNav === 'PROFILE' && current === 'EXPERIENCE';
-          const experienceToProfile = lastActiveNav === 'EXPERIENCE' && current === 'PROFILE';
-          if (profileToExperience || experienceToProfile) {
-            playProfileExperienceSwipeSfx();
-          }
-          if (current === 'CONTACT' && lastActiveNav !== 'CONTACT') {
-            if (contactFlashOverlay) {
-              contactFlashOverlay.classList.remove('active');
-              void contactFlashOverlay.offsetWidth;
-              contactFlashOverlay.classList.add('active');
-            }
-          }
-          syncContactVideoState(current);
-          lastActiveNav = current;
-        });
-        navObserver.observe(document.body, {
-          subtree: true,
-          attributes: true,
-          attributeFilter: ['data-active'],
-        });
-        const contactStateObserver = new MutationObserver(() => syncContactVideoState());
-        contactStateObserver.observe(document.body, {
-          subtree: true,
-          attributes: true,
-          attributeFilter: ['class', 'data-active'],
-          childList: true,
-        });
-        let sidequestSyncQueued = false;
-        const queueSidequestContentSync = () => {
-          if (sidequestSyncQueued) return;
-          sidequestSyncQueued = true;
-          requestAnimationFrame(() => {
-            sidequestSyncQueued = false;
-            enforceSidequestsContent();
-          });
-        };
-        const sidequestContentObserver = new MutationObserver(() => queueSidequestContentSync());
-        sidequestContentObserver.observe(document.body, {
-          subtree: true,
-          childList: true,
-        });
-        document.addEventListener(
-          'click',
-          (event) => {
-            const target = event.target;
-            if (!(target instanceof Element)) return;
-            const navLink = target.closest('.nav-tags a');
-            if (!navLink) return;
-            syncContactVideoState(navLink.textContent || '');
-          },
-          true
-        );
-        queueSidequestContentSync();
-        syncContactVideoState();
 
-        let lastExperienceHover = null;
-        document.addEventListener(
-          'pointerover',
-          (event) => {
-            const target = event.target;
-            if (!(target instanceof Element)) return;
-            const timelinePanel = document.querySelector('.timeline-panel.visible');
-            if (!timelinePanel) return;
-            const hoverItem = target.closest('.event-card, .timeline-kpi, .timeline-link-btn, .data-shard-btn, .sideproject-card');
-            if (!hoverItem || !timelinePanel.contains(hoverItem)) return;
-            if (hoverItem === lastExperienceHover) return;
-            lastExperienceHover = hoverItem;
-            playExperienceHoverSfx();
-          },
-          { passive: true }
-        );
-      };
-      if (SKIP_BOOT_SCREEN) {
-        if (loader) loader.remove();
-        if (sceneWarmupOverlay) sceneWarmupOverlay.remove();
-        await new Promise((resolve) => {
-          const script = document.createElement('script');
-          script.type = 'module';
-          script.src = 'app-runtime.js';
-          script.onload = resolve;
-          script.onerror = (error) => {
-            console.error('[boot] Failed to load app-runtime.js in skip mode', error);
-            resolve();
-          };
-          document.body.appendChild(script);
-        });
-        initSoundEffects();
-        return;
-      }
-      let contactVideoPauseTimer = null;
-      let suppressPreloadEffects = true;
-      let allowBackgroundMusic = false;
-      const blockedBackgroundMedia = new Set();
-      const nativeMediaPlay = HTMLMediaElement.prototype.play;
-      const isBackgroundTrack = (media) => {
-        const raw = media.currentSrc || media.src || '';
-        let decoded = raw;
-        try {
-          decoded = decodeURIComponent(raw);
-        } catch (_) {}
-        return /Cyberpunk_.*Netflix\.mp3|Really Want to Stay At Your House/i.test(decoded);
-      };
-      const enableBackgroundMusic = () => {
-        if (allowBackgroundMusic) return;
-        allowBackgroundMusic = true;
-        blockedBackgroundMedia.forEach((media) => {
-          try {
-            void nativeMediaPlay.call(media).catch(() => {});
-          } catch (_) {}
-        });
-        blockedBackgroundMedia.clear();
-      };
-      HTMLMediaElement.prototype.play = function (...args) {
-        if (!allowBackgroundMusic && isBackgroundTrack(this)) {
-          blockedBackgroundMedia.add(this);
-          return Promise.resolve();
-        }
-        return nativeMediaPlay.apply(this, args);
-      };
-      document.body.classList.add('preload-silent');
-      const start = performance.now();
-      let completed = 0;
-      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      const waitFrames = (count = 12) =>
-        new Promise((resolve) => {
-          let n = 0;
-          const tick = () => {
-            n += 1;
-            if (n >= count) resolve();
-            else requestAnimationFrame(tick);
-          };
-          requestAnimationFrame(tick);
-        });
-
-      const update = () => {
-        const pct = Math.round((completed / ASSETS.length) * 100);
-        fill.style.width = `${pct}%`;
-        label.textContent = `Loading assets... ${pct}%`;
-      };
-
-      const warm = async (href) => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'fetch';
-        link.href = href;
-        link.crossOrigin = 'anonymous';
-        document.head.appendChild(link);
-        try {
-          const response = await fetch(href, { cache: 'force-cache', credentials: 'same-origin', mode: 'same-origin' });
-          if (response.ok) {
-            await response.arrayBuffer();
-          }
-        } catch (_) {}
-        completed += 1;
-        update();
-      };
-      const warmInBatches = async (items, batchSize = 6) => {
-        for (let i = 0; i < items.length; i += batchSize) {
-          const batch = items.slice(i, i + batchSize);
-          await Promise.allSettled(batch.map(warm));
-        }
-      };
-      const decodeImage = async (href) => {
-        try {
-          const img = new Image();
-          img.decoding = 'async';
-          img.src = href;
-          if (img.decode) await img.decode();
-        } catch (_) {}
-      };
-      const decodeAudio = async (href) => {
-        try {
-          const audio = new Audio();
-          audio.preload = 'auto';
-          audio.src = href;
-          audio.load();
-        } catch (_) {}
-      };
-      const decodeVideo = async (href) => {
-        try {
-          const video = document.createElement('video');
-          video.muted = true;
-          video.playsInline = true;
-          video.preload = 'auto';
-          video.src = href;
-          await new Promise((resolve) => {
-            let done = false;
-            const finish = () => {
-              if (done) return;
-              done = true;
-              resolve();
-            };
-            video.addEventListener('loadeddata', finish, { once: true });
-            video.addEventListener('canplaythrough', finish, { once: true });
-            video.addEventListener('error', finish, { once: true });
-            video.load();
-            setTimeout(finish, 2500);
-          });
-        } catch (_) {}
-      };
-      const waitFor = async (selector, timeoutMs = 10000) => {
-        const started = performance.now();
-        while (performance.now() - started < timeoutMs) {
-          const node = document.querySelector(selector);
-          if (node) return node;
-          await sleep(50);
-        }
-        return null;
-      };
-      const waitUntil = async (predicate, timeoutMs = 10000, stepMs = 50) => {
-        const started = performance.now();
-        while (performance.now() - started < timeoutMs) {
-          if (predicate()) return true;
-          await sleep(stepMs);
-        }
-        return false;
-      };
-      const clickNav = (labelText) => {
-        const links = Array.from(document.querySelectorAll('.nav-tags a'));
-        const normalizedTarget = labelText.replace(/\s+/g, '').toUpperCase();
-        const link = links.find((a) => (a.textContent || '').replace(/\s+/g, '').toUpperCase() === normalizedTarget);
-        if (link instanceof HTMLElement) {
-          link.click();
-          return true;
-        }
-        return false;
-      };
-      const prewarmSections = async () => {
-        if (document.hidden) return;
-        const nav = await waitFor('.nav-tags');
-        if (!nav) return;
-        const sequence = ['HOME', 'PROFILE', 'EXPERIENCE', 'SIDE QUESTS', 'CONTACT', 'HOME'];
-        for (const section of sequence) {
-          clickNav(section);
-          await sleep(section === 'SIDE QUESTS' ? 520 : 260);
-        }
-      };
-
-      update();
-      if (DISABLE_PRELOAD) {
-        completed = ASSETS.length;
-        update();
-      } else {
-        await warmInBatches(ASSETS, 6);
-        label.textContent = 'Decoding textures/audio...';
-        await Promise.allSettled([
-          ...ASSETS.filter((a) => /\.(png|jpe?g|webp|svg)$/i.test(a)).map(decodeImage),
-          ...ASSETS.filter((a) => /\.(mp3|wav|ogg)$/i.test(a)).map(decodeAudio),
-          ...ASSETS.filter((a) => /\.(mp4|webm|m4v|mov)$/i.test(a)).map(decodeVideo),
-        ]);
-      }
-      if (label) {
-        label.textContent = 'Booting interface...';
-      }
-      const loadRuntimeScript = (src, timeoutMs = 12000) =>
-        new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.type = 'module';
-          script.src = src;
-          let done = false;
-          const finish = (err) => {
-            if (done) return;
-            done = true;
-            clearTimeout(timer);
-            script.onload = null;
-            script.onerror = null;
-            if (err) reject(err);
-            else resolve();
-          };
-          const timer = setTimeout(() => finish(new Error(`Runtime load timeout: ${src}`)), timeoutMs);
-          script.onload = () => finish();
-          script.onerror = () => finish(new Error(`Runtime load error: ${src}`));
-          document.body.appendChild(script);
-        });
-      let runtimeLoaded = false;
-      const runtimeUrl = `app-runtime.js?boot=${Date.now()}`;
-      try {
-        await loadRuntimeScript(runtimeUrl, 12000);
-        runtimeLoaded = true;
-      } catch (runtimeLoadError) {
-        console.error('[boot] Script injection failed for app-runtime.js', runtimeLoadError);
-      }
-      if (!runtimeLoaded) {
-        const fallbackUrl = `app-runtime.js?boot-fallback=${Date.now()}`;
-        try {
-          await import(/* @vite-ignore */ fallbackUrl);
-          runtimeLoaded = true;
-        } catch (runtimeImportError) {
-          console.error('[boot] Dynamic import failed for app-runtime.js', runtimeImportError);
-        }
-      }
-      if (!runtimeLoaded) {
-        if (label) {
-          label.textContent = 'Boot failed loading interface. Click RETRY.';
-        }
-        if (bootStart instanceof HTMLElement) {
-          bootStart.textContent = 'RETRY';
-          bootStart.classList.add('visible');
-          await new Promise((resolve) => {
-            const onRetry = () => {
-              bootStart.removeEventListener('click', onRetry);
-              window.location.reload();
-              resolve();
-            };
-            bootStart.addEventListener('click', onRetry);
-          });
-        }
-      }
-
-      // Profile tech hover SFX: play only when user hovers a different tag.
-      const createPolySfxPlayer = (src, volume = 0.5, maxVoices = 8, startAtSec = 0) => {
-        const seed = new Audio(src);
-        seed.preload = 'auto';
-        seed.volume = volume;
-        const voices = new Set();
-        return () => {
-          if (suppressPreloadEffects) return;
-          try {
-            if (voices.size >= maxVoices) return;
-            const voice = seed.cloneNode(true);
-            voice.volume = volume;
-            voices.add(voice);
-            const clear = () => voices.delete(voice);
-            voice.addEventListener('ended', clear, { once: true });
-            voice.addEventListener('error', clear, { once: true });
-            if (startAtSec > 0) {
-              const jump = () => {
-                try {
-                  voice.currentTime = startAtSec;
-                } catch (_) {}
-              };
-              if (voice.readyState >= 1) jump();
-              else voice.addEventListener('loadedmetadata', jump, { once: true });
-            }
-            void voice.play().catch(clear);
-          } catch (_) {}
-        };
-      };
-
-      const playTechHoverSfx = createPolySfxPlayer('mixkit-arcade-mechanical-bling-210.wav', 0.45, 10, 0.1);
-      let lastTechHover = '';
-      document.addEventListener(
-        'pointerover',
-        (event) => {
-          const target = event.target;
-          if (!(target instanceof Element)) return;
-          const tag = target.closest('.tech-tag');
-          if (!tag) return;
-          const profilePanel = document.querySelector('.profile-panel.visible');
-          if (!profilePanel || !profilePanel.contains(tag)) return;
-          const label = (tag.textContent || '').trim();
-          if (!label || label === lastTechHover) return;
-          lastTechHover = label;
-          playTechHoverSfx();
-        },
-        { passive: true }
-      );
-
-      // Scene transition SFX (black/red wipe transition and section changes).
-      const playTransitionSfxInstance = createPolySfxPlayer('mixkit-machine-activation-short-3180.wav', 0.52, 8);
-      const playProfileExperienceSwipeSfx = createPolySfxPlayer('mixkit-fast-swipe-zoom-2627.wav', 0.5, 8);
-      const playExperienceHoverSfx = createPolySfxPlayer('mixkit-sci-fi-positive-notification-266.wav', 0.42, 10, 0.25);
-      let lastTransitionSfxAt = 0;
-      const playTransitionSfx = () => {
-        const now = performance.now();
-        if (now - lastTransitionSfxAt < 180) return;
-        lastTransitionSfxAt = now;
-        playTransitionSfxInstance();
-      };
-      const transitionObserver = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-          if (mutation.type !== 'attributes') continue;
-          const target = mutation.target;
-          if (!(target instanceof Element)) continue;
-          if (target.matches('.impact-frame.flash, .wipe-band.animate')) {
-            playTransitionSfx();
-            return;
-          }
-        }
-      });
-      transitionObserver.observe(document.body, {
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class'],
-      });
-
-      // Play fast swipe SFX only when transitioning PROFILE <-> EXPERIENCE.
-      const getActiveNavLabel = () => {
-        const active = document.querySelector('.nav-tags a[data-active="true"]');
-        return ((active?.textContent || '').trim() || '').toUpperCase();
-      };
-      let hasSceneWarmupRun = DISABLE_PRELOAD;
-      let isRunningSceneWarmup = false;
-      let lastActiveNav = getActiveNavLabel();
-      let criticalBannerTimer = null;
-      const triggerContactTransitionFx = () => {
-        if (contactFlashOverlay) {
-          contactFlashOverlay.classList.remove('active');
-          // Force reflow so repeated activations restart animation.
-          void contactFlashOverlay.offsetWidth;
-          contactFlashOverlay.classList.add('active');
-        }
-      };
-      const navObserver = new MutationObserver(() => {
-        const current = getActiveNavLabel();
-        if (!current || current === lastActiveNav) return;
-        if (isRunningSceneWarmup) {
-          lastActiveNav = current;
-          return;
-        }
-        const profileToExperience = lastActiveNav === 'PROFILE' && current === 'EXPERIENCE';
-        const experienceToProfile = lastActiveNav === 'EXPERIENCE' && current === 'PROFILE';
-        if (profileToExperience || experienceToProfile) {
-          playProfileExperienceSwipeSfx();
-        }
-        if (current === 'CONTACT' && lastActiveNav !== 'CONTACT') {
-          triggerContactTransitionFx();
-        }
-        document.body.classList.toggle('contact-lock', current === 'CONTACT');
-        lastActiveNav = current;
-      });
-      navObserver.observe(document.body, {
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['data-active'],
-      });
-      document.addEventListener(
-        'click',
-        (event) => {
-          const target = event.target;
-          if (!(target instanceof Element)) return;
-          const navLink = target.closest('.nav-tags a');
-          if (!navLink) return;
-          const navText = (navLink.textContent || '').trim().toUpperCase();
-          const lockingContact = navText === 'CONTACT';
-          document.body.classList.toggle('contact-lock', lockingContact);
-          if (lockingContact && contactVideo instanceof HTMLVideoElement) {
-            void contactVideo.play().catch(() => {});
-          }
-        },
-        true
-      );
-
-      // Fallback cleanup: ensure critical banner class is removed after 3s.
-      const criticalObserver = new MutationObserver(() => {
-        const banner = document.querySelector('.critical-banner.active');
-        if (!(banner instanceof HTMLElement)) return;
-        if (criticalBannerTimer) clearTimeout(criticalBannerTimer);
-        criticalBannerTimer = setTimeout(() => {
-          banner.classList.remove('active');
-          criticalBannerTimer = null;
-        }, 3000);
-      });
-      criticalObserver.observe(document.body, {
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class'],
-      });
-
-      // Experience hover SFX: trigger on new hovered card-like elements.
-      let lastExperienceHover = null;
-      document.addEventListener(
-        'pointerover',
-        (event) => {
-          const target = event.target;
-          if (!(target instanceof Element)) return;
-          const timelinePanel = document.querySelector('.timeline-panel.visible');
-          if (!timelinePanel) return;
-          const hoverItem = target.closest('.event-card, .timeline-kpi, .timeline-link-btn, .data-shard-btn, .sideproject-card');
-          if (!hoverItem || !timelinePanel.contains(hoverItem)) return;
-          if (hoverItem === lastExperienceHover) return;
-          lastExperienceHover = hoverItem;
-          playExperienceHoverSfx();
-        },
-        { passive: true }
-      );
-
-      // Make experience feed click-and-drag scrollable.
-      const enableDragScroll = (selector) => {
-        const state = new WeakMap();
-        const tryAttach = () => {
-          document.querySelectorAll(selector).forEach((el) => {
-            if (!(el instanceof HTMLElement)) return;
-            if (state.has(el)) return;
-            const s = { active: false, startY: 0, startX: 0, top: 0, left: 0 };
-            state.set(el, s);
-            el.addEventListener('pointerdown', (event) => {
-              if (event.button !== 0) return;
-              s.active = true;
-              el.setAttribute('data-drag-hinted', '1');
-              s.startY = event.clientY;
-              s.startX = event.clientX;
-              s.top = el.scrollTop;
-              s.left = el.scrollLeft;
-              el.classList.add('is-dragging');
-              el.setPointerCapture(event.pointerId);
+        const installSceneClassSync = () => {
+          let syncQueued = false;
+          const queueSync = () => {
+            if (syncQueued) return;
+            syncQueued = true;
+            requestAnimationFrame(() => {
+              syncQueued = false;
+              syncSceneClasses();
             });
-            el.addEventListener('pointermove', (event) => {
-              if (!s.active) return;
-              const dy = event.clientY - s.startY;
-              const dx = event.clientX - s.startX;
-              el.scrollTop = s.top - dy;
-              el.scrollLeft = s.left - dx;
-            });
-            const stop = (event) => {
-              if (!s.active) return;
-              s.active = false;
-              el.classList.remove('is-dragging');
+          };
+
+          const observer = new MutationObserver(() => queueSync());
+          observer.observe(document.body, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: ['class', 'data-active'],
+          });
+
+          document.addEventListener('click', queueSync, true);
+          window.addEventListener('hashchange', queueSync);
+          queueSync();
+        };
+
+        const preloadAsset = async (assetPath) => {
+          const response = await fetch(toAssetUrl(assetPath), { cache: 'force-cache' });
+          if (!response.ok) {
+            throw new Error(`Failed ${assetPath}: ${response.status}`);
+          }
+          // Read the response so the browser fully warms the cache.
+          await response.blob();
+        };
+
+        const preloadInBatches = async (assets, onTick) => {
+          let cursor = 0;
+          let done = 0;
+          let failed = 0;
+
+          const worker = async () => {
+            while (cursor < assets.length) {
+              const index = cursor;
+              cursor += 1;
+              const asset = assets[index];
               try {
-                el.releasePointerCapture(event.pointerId);
-              } catch (_) {}
-            };
-            el.addEventListener('pointerup', stop);
-            el.addEventListener('pointercancel', stop);
-            el.addEventListener('pointerleave', stop);
-          });
-        };
-        tryAttach();
-        const mo = new MutationObserver(tryAttach);
-        mo.observe(document.body, { childList: true, subtree: true });
-      };
-      enableDragScroll('.timeline-feed, .timeline-sideprojects, .sideproject-list, .profile-tech-side');
-
-      // One-pass scene warmup: load each section once so first user transition is already compiled.
-      const runSceneWarmup = async () => {
-        if (hasSceneWarmupRun || isRunningSceneWarmup) return;
-        isRunningSceneWarmup = true;
-        sceneWarmupOverlay?.classList.add('visible');
-        const sequence = [
-          ['HOME', '.hero-text', 180, 10],
-          ['PROFILE', '.profile-panel.visible', 240, 14],
-          ['EXPERIENCE', '.timeline-panel.visible', 240, 14],
-          ['SIDE QUESTS', '.sidequests-panel.visible', 320, 18],
-          ['CONTACT', '.contact-panel.visible', 220, 12],
-          ['HOME', '.hero-text', 160, 10],
-        ];
-        const totalSteps = sequence.length + 1;
-        let stepIndex = 0;
-        const setWarmupStep = (text) => {
-          stepIndex += 1;
-          if (label) {
-            label.textContent = `Scene preload ${stepIndex}/${totalSteps}: ${text}`;
-          }
-        };
-        try {
-          for (const [labelText, visibleSelector, settleMs, frameCount] of sequence) {
-            setWarmupStep(`Warming ${labelText}`);
-            clickNav(labelText);
-            await waitFor(visibleSelector, 2200);
-            await waitFrames(frameCount);
-            await sleep(settleMs);
-          }
-          setWarmupStep('Finalizing cache');
-          hasSceneWarmupRun = true;
-        } finally {
-          isRunningSceneWarmup = false;
-          sceneWarmupOverlay?.classList.remove('visible');
-        }
-      };
-
-      const startIntroAndWaitReady = async () => {
-        // Runtime can already be interactive; only drive intro if it's still visible.
-        const nav = await waitFor('.nav-tags', 1200);
-        if (nav) {
-          await waitFrames(6);
-          return;
-        }
-        const enterBtn = await waitFor('.intro-enter', 9000);
-        if (enterBtn instanceof HTMLElement) {
-          enterBtn.click();
-        }
-        await waitFor('.nav-tags', 7000);
-        await waitUntil(() => !document.querySelector('.intro-overlay'), 5000, 40);
-        await waitFrames(10);
-      };
-
-      // Scene atmosphere toggles.
-      const syncSceneAtmosphere = () => {
-        const onSidequests = !!document.querySelector('.sidequests-panel.visible');
-        const onContact = !!document.querySelector('.contact-panel.visible') || document.body.classList.contains('contact-lock');
-        document.body.classList.toggle('sidequests-active', onSidequests);
-        document.body.classList.toggle('contact-active', onContact);
-        const contactPanel = document.querySelector('.contact-panel');
-        if (contactPanel) {
-          const ctas = Array.from(contactPanel.querySelectorAll('.social-row .social-btn'));
-          const emailCta = ctas.find((node) => {
-            if (!(node instanceof HTMLAnchorElement)) return false;
-            const text = (node.textContent || '').trim().toUpperCase();
-            const href = (node.getAttribute('href') || '').toLowerCase();
-            return text.includes('EMAIL') || href.startsWith('mailto:');
-          });
-          if (emailCta instanceof HTMLAnchorElement) {
-            emailCta.textContent = 'EMAIL ME';
-            emailCta.setAttribute('href', 'mailto:clim40@calpoly.edu');
-          }
-        }
-        if (contactVideo instanceof HTMLVideoElement) {
-          if (contactVideoPauseTimer) {
-            clearTimeout(contactVideoPauseTimer);
-            contactVideoPauseTimer = null;
-          }
-          if (onContact) {
-            void contactVideo.play().catch(() => {});
-          } else {
-            // Let opacity crossfade finish before pausing decode/playback.
-            contactVideoPauseTimer = setTimeout(() => {
-              contactVideo.pause();
-              contactVideoPauseTimer = null;
-            }, 420);
-          }
-        }
-      };
-      syncSceneAtmosphere();
-      const moonObserver = new MutationObserver(syncSceneAtmosphere);
-      moonObserver.observe(document.body, {
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class'],
-        childList: true,
-      });
-
-      // Ensure intro fade fully completes even on frame drops.
-      document.addEventListener(
-        'click',
-        (event) => {
-          const target = event.target;
-          if (!(target instanceof Element)) return;
-          if (!target.closest('.intro-enter')) return;
-          const introOverlay = document.querySelector('.intro-overlay');
-          if (!introOverlay) return;
-          introOverlay.setAttribute('data-forced-fade', '1');
-        },
-        { passive: true }
-      );
-
-      const minVisible = 1800;
-      const elapsed = performance.now() - start;
-      if (elapsed < minVisible) {
-        await new Promise((r) => setTimeout(r, minVisible - elapsed));
-      }
-
-      if (!DISABLE_PRELOAD) {
-        if (label) {
-          label.textContent = 'Warming scene transitions...';
-        }
-        await startIntroAndWaitReady();
-        await runSceneWarmup();
-      }
-      if (label) {
-        label.textContent = 'Ready. Click START to enter.';
-      }
-      if (bootStart instanceof HTMLElement) {
-        bootStart.classList.add('visible');
-        await new Promise((resolve) => {
-          const onStart = () => {
-            bootStart.removeEventListener('click', onStart);
-            bootStart.classList.remove('visible');
-            suppressPreloadEffects = false;
-            document.body.classList.remove('preload-silent');
-            enableBackgroundMusic();
-            resolve();
+                await preloadAsset(asset);
+              } catch (error) {
+                failed += 1;
+                console.warn('[loader] preload failed:', asset, error);
+              } finally {
+                done += 1;
+                onTick(done, failed, asset);
+              }
+            }
           };
-          bootStart.addEventListener('click', onStart);
-        });
-      }
 
-      if (loader instanceof HTMLElement) {
-        loader.classList.add('done');
-        await new Promise((resolve) => {
-          let done = false;
-          const finish = () => {
-            if (done) return;
-            done = true;
-            resolve();
-          };
-          loader.addEventListener(
-            'transitionend',
-            (event) => {
-              if (event.target !== loader) return;
-              if (event.propertyName !== 'opacity') return;
-              finish();
-            },
-            { once: true }
+          const workers = Array.from(
+            { length: Math.max(1, Math.min(CONCURRENCY, assets.length || 1)) },
+            () => worker()
           );
-          setTimeout(finish, 1100);
-        });
-        loader.remove();
-      }
+          await Promise.all(workers);
+          return { done, failed };
+        };
+
+        const wait = (ms) =>
+          new Promise((resolve) => {
+            window.setTimeout(resolve, ms);
+          });
+
+        const waitForCanvas = async (timeoutMs = 8000) => {
+          const start = performance.now();
+          while (performance.now() - start < timeoutMs) {
+            if (document.querySelector('#root canvas')) {
+              return true;
+            }
+            await wait(50);
+          }
+          return false;
+        };
+
+        const dispatchNavigationKey = (key) => {
+          window.dispatchEvent(
+            new KeyboardEvent('keydown', {
+              key,
+              bubbles: true,
+              cancelable: true,
+            })
+          );
+        };
+
+        const warmupCameraRoutes = async () => {
+          const ready = await waitForCanvas(8000);
+          if (!ready) {
+            console.warn('[loader] skipped camera warmup: canvas not ready');
+            return false;
+          }
+
+          window.__PRELOAD_ALLOW_NAV__ = true;
+          try {
+            await wait(260);
+            for (let step = 0; step < 4; step += 1) {
+              dispatchNavigationKey('ArrowDown');
+              await wait(900);
+            }
+            await wait(320);
+            for (let step = 0; step < 4; step += 1) {
+              dispatchNavigationKey('ArrowUp');
+              await wait(650);
+            }
+            await wait(160);
+            return true;
+          } finally {
+            window.__PRELOAD_ALLOW_NAV__ = false;
+          }
+        };
+
+        const boot = async () => {
+          document.body.classList.add('preload-silent');
+          try {
+            installSceneClassSync();
+            setProgress(0, 1, 'Loading asset manifest...');
+            const manifestResponse = await fetch(MANIFEST_PATH, { cache: 'no-cache' });
+            if (!manifestResponse.ok) {
+              throw new Error(`Manifest request failed: ${manifestResponse.status}`);
+            }
+            const manifest = await manifestResponse.json();
+            const assets = Array.isArray(manifest.assets) ? manifest.assets : [];
+            const totalSteps = assets.length + 2;
+
+            if (hint instanceof HTMLElement) {
+              hint.textContent = `Preloading ${assets.length} assets.`;
+            }
+
+            setProgress(0, totalSteps, `Preloading assets... 0/${assets.length}`);
+            const { failed } = await preloadInBatches(assets, (doneCount, failedCount) => {
+              const failSuffix = failedCount > 0 ? ` (${failedCount} failed)` : '';
+              setProgress(doneCount, totalSteps, `Preloading assets... ${doneCount}/${assets.length}${failSuffix}`);
+            });
+
+            setProgress(assets.length, totalSteps, 'Booting interface...');
+            await loadRuntime();
+            setProgress(assets.length + 1, totalSteps, 'Warming scene camera...');
+            await warmupCameraRoutes();
+            setProgress(totalSteps, totalSteps, failed > 0 ? 'Ready (with some preload misses).' : 'Ready.');
+          } catch (error) {
+            console.error('[loader] failed, booting runtime directly', error);
+            setProgress(0, 1, 'Loader failed. Booting directly...');
+            await loadRuntime();
+          }
+
+          document.body.classList.remove('preload-silent');
+          if (loader instanceof HTMLElement) {
+            loader.classList.add('done');
+            window.setTimeout(() => loader.remove(), 950);
+          }
+        };
+
+        void boot();
       })();
     </script>
   </body>
