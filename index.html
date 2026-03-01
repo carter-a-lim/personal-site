@@ -9,6 +9,9 @@
     <style>
       :root {
         --ui-scale: 1;
+        --hero-mobile-x: 0px;
+        --hero-mobile-y: 0px;
+        --hero-mobile-scale: 0.46;
       }
       html {
         font-size: calc(16px * var(--ui-scale));
@@ -230,6 +233,11 @@
       }
       .profile-panel .section-label {
         display: none !important;
+      }
+      /* Prevent hidden timeline internals from intercepting pointer input on other scenes. */
+      .timeline-panel:not(.visible),
+      .timeline-panel:not(.visible) * {
+        pointer-events: none !important;
       }
       /* Fix mojibake marker glyphs (render actual dots/triangles). */
       .event-card span::before,
@@ -636,6 +644,251 @@
           transform: translate(-50%, -50%) rotate(-90deg) scale(1.18);
         }
       }
+
+      /* Mobile-first runtime layout fixes */
+      @media (max-width: 900px) {
+        :root {
+          --ui-scale: 0.94;
+        }
+
+        body {
+          cursor: auto;
+          overscroll-behavior-y: contain;
+        }
+
+        #root {
+          height: 100dvh !important;
+          min-height: 100dvh !important;
+        }
+
+        .hud {
+          padding-top: max(0.9rem, env(safe-area-inset-top)) !important;
+          padding-right: max(0.9rem, env(safe-area-inset-right)) !important;
+          padding-left: max(0.9rem, env(safe-area-inset-left)) !important;
+          padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
+          justify-content: flex-start !important;
+          gap: 0.6rem;
+          height: 100dvh !important;
+        }
+
+        .hud-top {
+          display: grid !important;
+          gap: 0.55rem;
+          align-items: start;
+        }
+
+        .logo {
+          font-size: clamp(1.2rem, 6vw, 1.65rem) !important;
+          letter-spacing: 2px !important;
+        }
+
+        .nav-tags {
+          display: flex !important;
+          gap: 0.45rem !important;
+          overflow-x: auto;
+          white-space: nowrap;
+          -webkit-overflow-scrolling: touch;
+          border: none !important;
+          padding: 0.35rem 0.15rem 0.55rem !important;
+          max-width: 100%;
+          scrollbar-width: none;
+        }
+
+        .nav-tags::-webkit-scrollbar {
+          display: none;
+        }
+
+        .nav-tags a {
+          font-size: 0.62rem !important;
+          letter-spacing: 1.2px !important;
+          padding: 0.45rem 0.65rem !important;
+          min-height: 40px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-tags a[data-active='true'] {
+          border-color: rgba(252, 238, 9, 0.9);
+        }
+
+        .scroll-hint {
+          display: none !important;
+        }
+
+        .hud-status {
+          display: none !important;
+        }
+
+        .humanity-hud,
+        .hud-brackets,
+        .hud-crosshair {
+          display: none !important;
+        }
+
+        .profile-panel,
+        .timeline-panel,
+        .sidequests-panel,
+        .contact-panel {
+          padding-top: max(4.7rem, calc(env(safe-area-inset-top) + 4rem)) !important;
+          padding-right: max(0.9rem, env(safe-area-inset-right)) !important;
+          padding-left: max(0.9rem, env(safe-area-inset-left)) !important;
+          padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+          justify-content: flex-start !important;
+          align-items: stretch !important;
+          height: 100dvh !important;
+          overflow: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .profile-layout,
+        .timeline-layout {
+          grid-template-columns: 1fr !important;
+          min-height: auto !important;
+          max-height: none !important;
+          overflow: visible !important;
+        }
+
+        .profile-tech-side,
+        .timeline-summary,
+        .timeline-feed,
+        .timeline-sideprojects {
+          max-height: none !important;
+          min-height: 0 !important;
+          overflow-y: visible !important;
+        }
+
+        .timeline-panel .section-heading,
+        .contact-panel .section-heading::after {
+          font-size: clamp(2rem, 11vw, 3rem) !important;
+          letter-spacing: 1px !important;
+        }
+
+        .social-row {
+          width: 100%;
+          gap: 0.6rem !important;
+          margin-top: 1.2rem !important;
+        }
+
+        .social-btn {
+          flex: 1 1 100%;
+          width: 100%;
+          min-height: 44px;
+          text-align: center;
+          font-size: 0.68rem !important;
+          letter-spacing: 2px !important;
+          padding: 0.72rem 0.85rem !important;
+        }
+
+        .call-notification {
+          left: 50% !important;
+          top: 50% !important;
+          width: min(92vw, 360px);
+          transform: translate(-50%, -50%) !important;
+          padding: 0.9rem 0.95rem 1rem !important;
+        }
+
+        .call-actions {
+          width: 100%;
+          gap: 0.65rem !important;
+        }
+
+        .call-btn {
+          flex: 1 1 0;
+          min-height: 42px;
+          padding: 0.5rem 0.7rem !important;
+        }
+
+        .section-overlay {
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 0 max(0.8rem, env(safe-area-inset-right)) max(0.8rem, env(safe-area-inset-bottom))
+            max(0.8rem, env(safe-area-inset-left));
+        }
+
+        .sidequests-panel.visible {
+          pointer-events: auto !important;
+          touch-action: pan-y;
+        }
+
+        .sidequests-panel .quests-grid {
+          pointer-events: auto !important;
+          touch-action: pan-y;
+        }
+
+        .sidequests-panel .quest-card {
+          pointer-events: auto !important;
+          touch-action: pan-y;
+          cursor: grab;
+        }
+
+        .sidequests-panel .quest-card:active {
+          cursor: grabbing;
+        }
+
+        .hero-text {
+          width: 100%;
+          max-width: 100%;
+          text-align: center !important;
+          display: flex;
+          flex-direction: column;
+          align-items: center !important;
+          justify-content: center;
+          margin: 0 auto !important;
+          overflow: visible;
+        }
+
+        .hero-kicker {
+          font-size: clamp(0.6rem, 3.2vw, 0.78rem) !important;
+          letter-spacing: 0.22rem !important;
+          margin-bottom: 0.5rem !important;
+          max-width: 100%;
+        }
+
+        .hero-name {
+          align-items: flex-start !important;
+          width: 760px !important;
+          max-width: 760px !important;
+          line-height: 0.85 !important;
+          margin: 0 auto !important;
+          transform-origin: top left !important;
+          transform:
+            translate3d(var(--hero-mobile-x), var(--hero-mobile-y), 0)
+            scale(var(--hero-mobile-scale)) !important;
+          will-change: transform;
+        }
+
+        .hero-letters-container {
+          width: max-content;
+          margin-left: 0 !important;
+        }
+
+        .edgerunner-badge {
+          max-width: none !important;
+        }
+
+        .er-text {
+          font-size: clamp(1.4rem, 3.8vw, 2rem) !important;
+        }
+
+        .hero-sub {
+          margin-top: 0.55rem !important;
+          font-size: clamp(0.74rem, 3.4vw, 0.92rem) !important;
+          letter-spacing: 2px !important;
+        }
+
+        .hero-cta {
+          margin-top: 1rem !important;
+          width: min(88vw, 320px);
+          min-height: 44px;
+          padding: 0.7rem 1rem !important;
+          font-size: 0.72rem !important;
+          letter-spacing: 3px !important;
+          text-align: center;
+        }
+      }
     </style>
   </head>
   <body>
@@ -802,6 +1055,71 @@
           return false;
         };
 
+        const installMobileHeroAutoLayout = () => {
+          const isMobile = window.matchMedia('(max-width: 900px)').matches;
+          if (!isMobile) {
+            return;
+          }
+
+          const rootStyle = document.documentElement.style;
+          let rafId = 0;
+
+          const apply = () => {
+            rafId = 0;
+            const heroName = document.querySelector('.hero-name');
+            if (!(heroName instanceof HTMLElement)) {
+              return;
+            }
+
+            // Measure at neutral transform, then fit the full composed box.
+            rootStyle.setProperty('--hero-mobile-x', '0px');
+            rootStyle.setProperty('--hero-mobile-y', '0px');
+            rootStyle.setProperty('--hero-mobile-scale', '1');
+
+            const rect = heroName.getBoundingClientRect();
+            if (rect.width < 8 || rect.height < 8) {
+              return;
+            }
+
+            const viewportW = window.innerWidth;
+            const viewportH = window.innerHeight;
+            const horizontalPad = 12;
+            const maxBoxW = Math.max(220, viewportW - horizontalPad * 2);
+            const maxBoxH = Math.max(140, viewportH * 0.34);
+
+            let scale = Math.min(maxBoxW / rect.width, maxBoxH / rect.height, 0.62);
+            scale = Math.max(0.28, scale);
+
+            const targetTop = Math.max(70, viewportH * 0.22);
+            const x = (viewportW - rect.width * scale) / 2 - rect.left;
+            const y = targetTop - rect.top;
+
+            rootStyle.setProperty('--hero-mobile-x', `${Math.round(x)}px`);
+            rootStyle.setProperty('--hero-mobile-y', `${Math.round(y)}px`);
+            rootStyle.setProperty('--hero-mobile-scale', String(Number(scale.toFixed(3))));
+          };
+
+          const queueApply = () => {
+            if (rafId) return;
+            rafId = window.requestAnimationFrame(apply);
+          };
+
+          const mutationObserver = new MutationObserver(() => queueApply());
+          mutationObserver.observe(document.body, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: ['class', 'style'],
+          });
+
+          window.addEventListener('resize', queueApply, { passive: true });
+          window.addEventListener('orientationchange', queueApply, { passive: true });
+
+          queueApply();
+          window.setTimeout(queueApply, 250);
+          window.setTimeout(queueApply, 700);
+        };
+
         const dispatchNavigationKey = (key) => {
           window.dispatchEvent(
             new KeyboardEvent('keydown', {
@@ -895,6 +1213,7 @@
 
             setProgress(assets.length, totalSteps, 'Booting interface...');
             await loadRuntime();
+            installMobileHeroAutoLayout();
             setProgress(assets.length + 1, totalSteps, 'Warming scene camera...');
             await warmupCameraRoutes();
             setProgress(totalSteps, totalSteps, failed > 0 ? 'Ready (with some preload misses).' : 'Ready.');
@@ -902,6 +1221,7 @@
             console.error('[loader] failed, booting runtime directly', error);
             setProgress(0, 1, 'Loader failed. Booting directly...');
             await loadRuntime();
+            installMobileHeroAutoLayout();
           }
 
           document.body.classList.remove('preload-silent');
@@ -912,6 +1232,205 @@
         };
 
         void boot();
+      })();
+    </script>
+    <script>
+      (() => {
+        const params = new URLSearchParams(window.location.search);
+        const enabled = params.get('heroTune') === '1';
+        const mobile = window.matchMedia('(max-width: 900px)').matches;
+        if (!enabled || !mobile) return;
+
+        const root = document.documentElement;
+        const STORAGE_KEY = 'hero-mobile-tune-v1';
+        const defaults = { x: 0, y: 0, scale: 0.46 };
+        let state = { ...defaults };
+
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+          if (Number.isFinite(saved.x)) state.x = saved.x;
+          if (Number.isFinite(saved.y)) state.y = saved.y;
+          if (Number.isFinite(saved.scale)) state.scale = saved.scale;
+        } catch {}
+
+        const applyState = () => {
+          root.style.setProperty('--hero-mobile-x', `${state.x}px`);
+          root.style.setProperty('--hero-mobile-y', `${state.y}px`);
+          root.style.setProperty('--hero-mobile-scale', String(state.scale));
+        };
+
+        const saveState = () => {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          } catch {}
+        };
+
+        const panel = document.createElement('div');
+        panel.id = 'hero-tuner-panel';
+        panel.style.cssText = [
+          'position:fixed',
+          'left:10px',
+          'bottom:10px',
+          'z-index:13000',
+          'width:min(92vw,340px)',
+          'background:rgba(0,8,20,0.9)',
+          'border:1px solid rgba(0,240,255,0.55)',
+          'color:#e8f6ff',
+          'font-family:Share Tech Mono, monospace',
+          'font-size:12px',
+          'padding:10px',
+          'display:grid',
+          'gap:8px',
+          'backdrop-filter:blur(4px)',
+        ].join(';');
+
+        const row = (label, min, max, step, value, onInput) => {
+          const wrap = document.createElement('label');
+          wrap.style.display = 'grid';
+          wrap.style.gap = '4px';
+          const top = document.createElement('div');
+          top.textContent = label;
+          const input = document.createElement('input');
+          input.type = 'range';
+          input.min = String(min);
+          input.max = String(max);
+          input.step = String(step);
+          input.value = String(value);
+          input.addEventListener('input', () => onInput(Number(input.value)));
+          wrap.append(top, input);
+          return { wrap, input };
+        };
+
+        const valueLine = document.createElement('div');
+        valueLine.style.opacity = '0.9';
+
+        const xRow = row('X', -280, 280, 1, state.x, (v) => {
+          state.x = v;
+          applyState();
+          renderValues();
+          saveState();
+        });
+        const yRow = row('Y', -280, 280, 1, state.y, (v) => {
+          state.y = v;
+          applyState();
+          renderValues();
+          saveState();
+        });
+        const sRow = row('Scale', 0.28, 0.72, 0.005, state.scale, (v) => {
+          state.scale = Number(v.toFixed(3));
+          applyState();
+          renderValues();
+          saveState();
+        });
+
+        const btnRow = document.createElement('div');
+        btnRow.style.display = 'flex';
+        btnRow.style.gap = '8px';
+
+        const mkBtn = (txt, onClick) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = txt;
+          btn.style.cssText = [
+            'border:1px solid rgba(0,240,255,0.65)',
+            'background:rgba(0,240,255,0.2)',
+            'color:#e8f6ff',
+            'font:inherit',
+            'padding:6px 8px',
+            'cursor:pointer',
+          ].join(';');
+          btn.addEventListener('click', onClick);
+          return btn;
+        };
+
+        const copyBtn = mkBtn('Copy Values', async () => {
+          const txt = `x=${state.x}, y=${state.y}, scale=${state.scale}`;
+          try {
+            await navigator.clipboard.writeText(txt);
+            copyBtn.textContent = 'Copied';
+            window.setTimeout(() => {
+              copyBtn.textContent = 'Copy Values';
+            }, 900);
+          } catch {
+            copyBtn.textContent = txt;
+          }
+        });
+
+        const resetBtn = mkBtn('Reset', () => {
+          state = { ...defaults };
+          xRow.input.value = String(state.x);
+          yRow.input.value = String(state.y);
+          sRow.input.value = String(state.scale);
+          applyState();
+          renderValues();
+          saveState();
+        });
+
+        const renderValues = () => {
+          valueLine.textContent = `x=${state.x}, y=${state.y}, scale=${state.scale}`;
+        };
+
+        btnRow.append(copyBtn, resetBtn);
+        panel.append(valueLine, xRow.wrap, yRow.wrap, sRow.wrap, btnRow);
+        document.body.appendChild(panel);
+
+        const findHero = () => document.querySelector('.hero-name');
+        let activeHero = null;
+        let dragState = null;
+
+        const onPointerMove = (event) => {
+          if (!dragState) return;
+          const dx = event.clientX - dragState.startX;
+          const dy = event.clientY - dragState.startY;
+          state.x = Math.round(dragState.baseX + dx);
+          state.y = Math.round(dragState.baseY + dy);
+          xRow.input.value = String(state.x);
+          yRow.input.value = String(state.y);
+          applyState();
+          renderValues();
+        };
+
+        const onPointerUp = () => {
+          if (!dragState) return;
+          dragState = null;
+          saveState();
+          window.removeEventListener('pointermove', onPointerMove);
+          window.removeEventListener('pointerup', onPointerUp);
+        };
+
+        const bindHeroDrag = () => {
+          const hero = findHero();
+          if (!hero || hero === activeHero) return;
+          activeHero = hero;
+          const heroText = hero.closest('.hero-text');
+          if (heroText instanceof HTMLElement) {
+            heroText.style.pointerEvents = 'auto';
+          }
+          hero.style.pointerEvents = 'auto';
+          hero.style.touchAction = 'none';
+          hero.style.cursor = 'grab';
+          hero.addEventListener('pointerdown', (event) => {
+            if (!hero.closest('.hero-text')) return;
+            dragState = {
+              startX: event.clientX,
+              startY: event.clientY,
+              baseX: state.x,
+              baseY: state.y,
+            };
+            hero.style.cursor = 'grabbing';
+            window.addEventListener('pointermove', onPointerMove, { passive: true });
+            window.addEventListener('pointerup', () => {
+              hero.style.cursor = 'grab';
+            }, { once: true });
+            window.addEventListener('pointerup', onPointerUp, { once: true });
+          });
+        };
+
+        applyState();
+        renderValues();
+        bindHeroDrag();
+        const observer = new MutationObserver(() => bindHeroDrag());
+        observer.observe(document.body, { childList: true, subtree: true });
       })();
     </script>
   </body>
