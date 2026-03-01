@@ -812,6 +812,21 @@
           );
         };
 
+        const dispatchNavigationHome = () => {
+          const navLinks = Array.from(document.querySelectorAll('.nav-tags a'));
+          const homeLink = navLinks.find((link) => normalizeLabel(link.textContent || '') === 'HOME');
+          if (!homeLink) {
+            return false;
+          }
+          homeLink.dispatchEvent(
+            new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+            })
+          );
+          return true;
+        };
+
         const warmupCameraRoutes = async () => {
           const ready = await waitForCanvas(8000);
           if (!ready) {
@@ -819,17 +834,34 @@
             return false;
           }
 
+          const warmupSteps = [
+            { key: 'ArrowDown', scene: 'PROFILE', waitMs: 900 },
+            { key: 'ArrowDown', scene: 'EXPERIENCE', waitMs: 900 },
+            { key: 'ArrowDown', scene: 'SIDEQUESTS', waitMs: 900 },
+            { key: 'ArrowDown', scene: 'CONTACT', waitMs: 900 },
+            { scene: 'HOME', waitMs: 560, home: true },
+          ];
+
           window.__PRELOAD_ALLOW_NAV__ = true;
           try {
             await wait(260);
-            for (let step = 0; step < 4; step += 1) {
-              dispatchNavigationKey('ArrowDown');
-              await wait(900);
-            }
-            await wait(320);
-            for (let step = 0; step < 4; step += 1) {
-              dispatchNavigationKey('ArrowUp');
-              await wait(650);
+            for (let stepIndex = 0; stepIndex < warmupSteps.length; stepIndex += 1) {
+              const step = warmupSteps[stepIndex];
+              if (hint instanceof HTMLElement) {
+                hint.textContent = `Warming scene camera ${stepIndex + 1}/${warmupSteps.length}: ${step.scene}`;
+              }
+              if (step.home) {
+                const movedHome = dispatchNavigationHome();
+                if (!movedHome) {
+                  for (let up = 0; up < 4; up += 1) {
+                    dispatchNavigationKey('ArrowUp');
+                    await wait(140);
+                  }
+                }
+              } else {
+                dispatchNavigationKey(step.key);
+              }
+              await wait(step.waitMs);
             }
             await wait(160);
             return true;
