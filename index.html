@@ -1195,6 +1195,138 @@
 
         const normalizeLabel = (value) => String(value || '').replace(/\s+/g, '').toUpperCase();
 
+        const installUiSfx = () => {
+          if (window.__UI_SFX_READY__) return;
+          window.__UI_SFX_READY__ = true;
+
+          const SOUND = {
+            nav: { src: 'mixkit-fast-swipe-zoom-2627.wav', volume: 0.34 },
+            confirm: { src: 'mixkit-sci-fi-positive-notification-266.wav', volume: 0.42 },
+            ui: { src: 'mixkit-arcade-mechanical-bling-210.wav', volume: 0.34 },
+            activate: { src: 'mixkit-machine-activation-short-3180.wav', volume: 0.36 },
+          };
+
+          const pools = new Map();
+          let audioUnlocked = false;
+          let lastNav = '';
+
+          const canPlayNow = () => {
+            if (document.body.classList.contains('preload-silent')) return false;
+            if (window.__PRELOAD_ALLOW_NAV__) return false;
+            return true;
+          };
+
+          const makePool = (name, size = 3) => {
+            const config = SOUND[name];
+            if (!config) return [];
+            const list = Array.from({ length: size }, () => {
+              const audio = new Audio(toAssetUrl(config.src));
+              audio.preload = 'auto';
+              audio.volume = config.volume;
+              audio.load();
+              return audio;
+            });
+            pools.set(name, { list, idx: 0 });
+            return list;
+          };
+
+          const getPool = (name) => {
+            if (!pools.has(name)) {
+              makePool(name);
+            }
+            return pools.get(name);
+          };
+
+          const play = (name) => {
+            if (!audioUnlocked || !canPlayNow()) return;
+            const pool = getPool(name);
+            if (!pool || !pool.list.length) return;
+            pool.idx = (pool.idx + 1) % pool.list.length;
+            const audio = pool.list[pool.idx];
+            try {
+              audio.currentTime = 0;
+              void audio.play().catch(() => {});
+            } catch {}
+          };
+
+          const unlockAudio = () => {
+            if (audioUnlocked) return;
+            audioUnlocked = true;
+            ['nav', 'confirm', 'ui', 'activate'].forEach((key) => {
+              const pool = getPool(key);
+              if (!pool || !pool.list.length) return;
+              const a = pool.list[0];
+              try {
+                a.currentTime = 0;
+                const p = a.play();
+                if (p && typeof p.then === 'function') {
+                  p.then(() => {
+                    a.pause();
+                    a.currentTime = 0;
+                  }).catch(() => {});
+                }
+              } catch {}
+            });
+          };
+
+          document.addEventListener('pointerdown', unlockAudio, { passive: true, once: true });
+          document.addEventListener('keydown', unlockAudio, { once: true });
+          document.addEventListener('touchstart', unlockAudio, { passive: true, once: true });
+
+          const getActiveNavLabel = () => {
+            const activeNav = document.querySelector('.nav-tags a[data-active="true"]');
+            return normalizeLabel(activeNav?.textContent || '');
+          };
+
+          const navObserver = new MutationObserver(() => {
+            const active = getActiveNavLabel();
+            if (!active || active === lastNav) return;
+            if (lastNav) {
+              play(active === 'CONTACT' ? 'confirm' : 'nav');
+            }
+            lastNav = active;
+          });
+          navObserver.observe(document.body, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: ['data-active', 'class'],
+          });
+          lastNav = getActiveNavLabel();
+
+          document.addEventListener(
+            'click',
+            (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+
+              if (target.closest('.intro-enter')) {
+                play('activate');
+                return;
+              }
+
+              if (target.closest('.call-btn.accept') || target.closest('.call-btn.decline')) {
+                play('confirm');
+                return;
+              }
+
+              if (target.closest('.data-shard-btn, .timeline-link-btn, .social-btn, .bd-link-chip')) {
+                play('ui');
+                return;
+              }
+
+              const maybeMusic = target.closest('button');
+              if (maybeMusic instanceof HTMLButtonElement) {
+                const txt = (maybeMusic.textContent || '').trim().toUpperCase();
+                if (txt.startsWith('MUSIC:')) {
+                  play('activate');
+                }
+              }
+            },
+            true
+          );
+        };
+
         const syncSceneClasses = () => {
           const activeNav = document.querySelector('.nav-tags a[data-active="true"]');
           const activeLabel = normalizeLabel(activeNav?.textContent || '');
@@ -1642,6 +1774,7 @@
 
             setProgress(assets.length, totalSteps, 'Booting interface...');
             await loadRuntime();
+            installUiSfx();
             installMobileHeroAutoLayout();
             installBraindanceScrubber();
             setProgress(assets.length + 1, totalSteps, 'Warming scene camera...');
@@ -1651,6 +1784,7 @@
             console.error('[loader] failed, booting runtime directly', error);
             setProgress(0, 1, 'Loader failed. Booting directly...');
             await loadRuntime();
+            installUiSfx();
             installMobileHeroAutoLayout();
             installBraindanceScrubber();
           }
