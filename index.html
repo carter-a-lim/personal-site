@@ -1646,14 +1646,29 @@
           window.addEventListener('keydown', onArchiveKeydown, { capture: true });
 
           let lastWheelAt = 0;
+          let sidequestsActiveLatch = false;
+          let sidequestsEnteredAt = 0;
           const onArchiveWheel = (event) => {
-            if (!document.body.classList.contains('sidequests-active')) {
+            const active = document.body.classList.contains('sidequests-active');
+            if (!active) {
+              sidequestsActiveLatch = false;
               return;
             }
             const now = Date.now();
+            if (!sidequestsActiveLatch) {
+              sidequestsActiveLatch = true;
+              sidequestsEnteredAt = now;
+            }
+            // Always consume wheel on sidequests so section-level wheel navigation never leaks through.
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+
+            // Ignore initial wheel/momentum just after entering sidequests to avoid skipping edge cards.
+            if (now - sidequestsEnteredAt < 420) {
+              return;
+            }
             if (now - lastWheelAt < 260) {
-              event.preventDefault();
-              event.stopImmediatePropagation();
               return;
             }
             const delta = event.deltaY;
@@ -1661,12 +1676,18 @@
               return;
             }
             lastWheelAt = now;
-            event.preventDefault();
-            event.stopImmediatePropagation();
             if (delta > 0) {
-              if (activeIndex < memories.length - 1) go(1);
+              if (activeIndex < memories.length - 1) {
+                go(1);
+              } else if (!dispatchNavigationTo('CONTACT')) {
+                dispatchNavigationTo('Contact');
+              }
             } else if (delta < 0) {
-              if (activeIndex > 0) go(-1);
+              if (activeIndex > 0) {
+                go(-1);
+              } else if (!dispatchNavigationTo('TECHNOLOGIES')) {
+                dispatchNavigationTo('Technologies');
+              }
             }
           };
           window.addEventListener('wheel', onArchiveWheel, { capture: true, passive: false });
