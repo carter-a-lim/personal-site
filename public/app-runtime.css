@@ -45,3 +45,11 @@
 .bd-step[data-active="true"]{background:linear-gradient(90deg,var(--neon-cyan),var(--cyber-yellow));border-color:var(--neon-cyan);box-shadow:0 0 12px rgba(0,240,255,.45)}
 .bd-card-host{width:100%}
 .bd-card-active .bd-audio-copy{max-height:none;overflow:visible}
+/* Prevent bottom-left overlap between HUD status and music toggle */
+.hud-status{bottom:78px !important}
+
+/* Experience panel overlap fixes */
+.timeline-panel .section-label{margin-bottom:1.2rem !important;position:relative;z-index:6}
+.timeline-panel .section-heading{margin-top:.25rem !important;padding-top:.2rem !important}
+/* Remove off-screen SIGNAL_SYNCED block */
+.timeline-sync{display:none !important}

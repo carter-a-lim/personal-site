@@ -1340,6 +1340,9 @@
           document.body.classList.toggle('contact-active', onContact);
           document.body.classList.toggle('contact-lock', onContact);
           document.body.classList.toggle('sidequests-active', onSidequests && !onContact);
+          if (onSidequests && !onContact) {
+            installBraindanceScrubber();
+          }
 
           if (contactVideo instanceof HTMLVideoElement) {
             if (onContact) {
@@ -1777,11 +1780,22 @@
               throw new Error(`Manifest request failed: ${manifestResponse.status}`);
             }
             const manifest = await manifestResponse.json();
-            const assets = Array.isArray(manifest.assets) ? manifest.assets : [];
-            const totalSteps = assets.length + 2;
+            const allAssets = Array.isArray(manifest.assets) ? manifest.assets : [];
+            const assets = allAssets.filter((assetPath) => {
+              if (typeof assetPath !== 'string') return false;
+              // Home-first boot: skip heavy non-home assets during preload.
+              return !(
+                assetPath.includes('sidequests/') ||
+                assetPath.includes('IMG_0508') ||
+                assetPath.includes('IMG_6904') ||
+                assetPath.includes('signal-2026-02-27-164119') ||
+                assetPath.includes('vocaview-feature')
+              );
+            });
+            const totalSteps = assets.length + 1;
 
             if (hint instanceof HTMLElement) {
-              hint.textContent = `Preloading ${assets.length} assets.`;
+              hint.textContent = `Preloading ${assets.length} home assets.`;
             }
 
             setProgress(0, totalSteps, `Preloading assets... 0/${assets.length}`);
@@ -1794,9 +1808,6 @@
             await loadRuntime();
             installUiSfx();
             installMobileHeroAutoLayout();
-            installBraindanceScrubber();
-            setProgress(assets.length + 1, totalSteps, 'Warming scene camera...');
-            await warmupCameraRoutes();
             setProgress(totalSteps, totalSteps, failed > 0 ? 'Ready (with some preload misses).' : 'Ready.');
           } catch (error) {
             console.error('[loader] failed, booting runtime directly', error);
@@ -1804,7 +1815,6 @@
             await loadRuntime();
             installUiSfx();
             installMobileHeroAutoLayout();
-            installBraindanceScrubber();
           }
 
           document.body.classList.remove('preload-silent');
