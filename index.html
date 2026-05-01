@@ -471,7 +471,7 @@
         padding: 1rem;
         display: grid;
         grid-template-rows: auto auto minmax(0, 1fr);
-        gap: 0.8rem;
+        gap: 0.4rem;
         pointer-events: auto;
         overflow: hidden;
       }
@@ -480,6 +480,7 @@
         justify-content: space-between;
         align-items: baseline;
         gap: 1rem;
+        margin-bottom: 0.1rem;
       }
       .bd-title {
         margin: 0;
@@ -513,6 +514,7 @@
         display: grid;
         grid-template-columns: repeat(var(--bd-steps, 3), minmax(0, 1fr));
         gap: 0.35rem;
+        margin: 0;
       }
       .bd-step {
         height: 7px;
@@ -1494,7 +1496,7 @@
 
         const installBraindanceScrubber = () => {
           const host = document.getElementById('bd-scrubber');
-          if (!(host instanceof HTMLElement) || host.dataset.ready === '1') {
+          if (!(host instanceof HTMLElement) || host.dataset.readyVersion === '3') {
             return;
           }
 
@@ -1504,18 +1506,14 @@
               role: 'Startup Sprint',
               photo: 'signal-2026-02-27-164119.jpeg',
               log: 'Placed 1st at the 2025 Cal Poly Elevator Pitch Competition with a 90-second live pitch for Communicare, an AI communication coach. Framed market viability, technical scalability, and AI integration under high pressure, then handled judge Q&A in real time. Secured $1,000 in seed funding/prize money and turned a compressed prep window into a complete deliverable sprint.',
-              links: [
-                ['Pitch Video', 'https://youtu.be/fwE4Xvotm8s'],
-              ],
+              links: [['Pitch Video', 'https://youtu.be/fwE4Xvotm8s']],
             },
             {
               title: 'Clash Royale Tournament',
               role: 'Event + Strategy',
               photo: 'IMG_0508.jpg',
-              log: 'Directed Cal Poly\'s first 2v2 Clash Royale tournament and handled logistics for 12 teams (30+ attendees), including venue planning and bracket operations. Drove turnout with multi-channel promotion across flyers, Discord, and social channels, while also organizing prize incentives. During the event, resolved live connectivity issues and kept match flow stable to maintain competitive pacing.',
-              links: [
-                ['LinkedIn', 'https://www.linkedin.com/in/carter-a-lim/'],
-              ],
+              log: "Directed Cal Poly's first 2v2 Clash Royale tournament and handled logistics for 12 teams (30+ attendees), including venue planning and bracket operations. Drove turnout with multi-channel promotion across flyers, Discord, and social channels, while also organizing prize incentives. During the event, resolved live connectivity issues and kept match flow stable to maintain competitive pacing.",
+              links: [['LinkedIn', 'https://www.linkedin.com/in/carter-a-lim/']],
             },
             {
               title: 'Mustang Market Launch',
@@ -1539,142 +1537,115 @@
             },
           ];
 
+          let activeIndex = 0;
           host.dataset.ready = '1';
+          host.dataset.readyVersion = '3';
           host.innerHTML = `
             <div class="bd-shell">
               <div class="bd-topline">
                 <h3 class="bd-title">SIDEQUEST ARCHIVE</h3>
                 <p class="bd-sub">VISUAL / AUDIO</p>
               </div>
-              <div class="bd-scrub-wrap">
-                <label class="bd-scrub-label" for="bd-scrub-input">SCRUB MEMORY STREAM</label>
-                <input id="bd-scrub-input" class="bd-scrub" type="range" min="0" max="${memories.length - 1}" step="1" value="0" />
-                <div class="bd-step-track"></div>
-              </div>
-              <div class="bd-cards"></div>
+              <div class="bd-step-track"></div>
+              <div class="bd-card-host"></div>
             </div>
           `;
 
-          const cardsRoot = host.querySelector('.bd-cards');
-          const scrub = host.querySelector('#bd-scrub-input');
+          const cardHost = host.querySelector('.bd-card-host');
           const stepTrack = host.querySelector('.bd-step-track');
-          if (!(cardsRoot instanceof HTMLElement) || !(scrub instanceof HTMLInputElement) || !(stepTrack instanceof HTMLElement)) {
+          if (!(cardHost instanceof HTMLElement) || !(stepTrack instanceof HTMLElement)) {
             return;
           }
 
-          cardsRoot.innerHTML = memories
-            .map((memory, idx) => {
-              const visual = memory.photo
-                ? `<img class="bd-visual-img" src="${memory.photo}" alt="${memory.title}" loading="lazy" />`
-                : '';
-              return `
-                <article class="bd-card" data-index="${idx}">
-                  <div class="bd-main">
-                    <div class="bd-visual-wrap">
-                      <div class="bd-layer">Visual Layer</div>
-                      <div class="bd-visual">${visual}</div>
-                    </div>
-                    <div class="bd-audio">
-                      <div class="bd-layer">Audio Layer</div>
-                      <div class="bd-quest-meta">
-                        <span class="bd-meta-chip">${memory.title}</span>
-                        <span class="bd-meta-chip">${memory.role}</span>
-                      </div>
-                      <p class="bd-audio-copy">${memory.log}</p>
-                      ${
-                        Array.isArray(memory.links) && memory.links.length > 0
-                          ? `<div class="bd-links">${memory.links
-                              .map(
-                                ([label, href]) =>
-                                  `<a class="bd-link-chip" href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`
-                              )
-                              .join('')}</div>`
-                          : ''
-                      }
-                    </div>
-                  </div>
-                </article>
-              `;
-            })
-            .join('');
-
           stepTrack.innerHTML = memories
-            .map((_, idx) => `<button type="button" class="bd-step" data-index="${idx}" data-active="${idx === 0 ? 'true' : 'false'}" aria-label="Jump to memory ${idx + 1}"></button>`)
+            .map(
+              (_, idx) =>
+                `<button type="button" class="bd-step" data-index="${idx}" data-active="${idx === 0 ? 'true' : 'false'}" aria-label="Jump to memory ${idx + 1}"></button>`
+            )
             .join('');
           stepTrack.style.setProperty('--bd-steps', String(memories.length));
           const steps = Array.from(stepTrack.querySelectorAll('.bd-step'));
 
-          cardsRoot.querySelectorAll('.bd-visual-img').forEach((img) => {
-            const card = img.closest('.bd-card');
-            const applyOrientation = () => {
-              if (!(card instanceof HTMLElement)) return;
-              if (!img.naturalWidth || !img.naturalHeight) return;
-              const isPortrait = img.naturalHeight > img.naturalWidth;
-              card.classList.toggle('bd-card-portrait', isPortrait);
-            };
+          const renderCard = () => {
+            const memory = memories[activeIndex];
+            const visual = memory.photo
+              ? `<img class="bd-visual-img" src="${memory.photo}" alt="${memory.title}" loading="lazy" />`
+              : '';
+            const links =
+              Array.isArray(memory.links) && memory.links.length > 0
+                ? `<div class="bd-links">${memory.links
+                    .map(
+                      ([label, href]) =>
+                        `<a class="bd-link-chip" href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`
+                    )
+                    .join('')}</div>`
+                : '';
 
-            if (img.complete) {
-              applyOrientation();
-            } else {
-              img.addEventListener('load', applyOrientation, { once: true });
-            }
-
-            img.addEventListener('error', () => {
-              img.remove();
-              if (card instanceof HTMLElement) {
-                card.classList.remove('bd-card-portrait');
-              }
-            });
-          });
-
-          let activeIndex = 0;
-          let programmaticScroll = false;
-
-          const syncScanline = () => {
-            const max = Math.max(1, cardsRoot.scrollWidth - cardsRoot.clientWidth);
-            const ratio = cardsRoot.scrollLeft / max;
-            host.style.setProperty('--bd-scan-offset', `${Math.round(ratio * 100)}%`);
-          };
-
-          const setIndex = (index, scrollToCard) => {
-            activeIndex = Math.max(0, Math.min(memories.length - 1, index));
-            scrub.value = String(activeIndex);
+            cardHost.innerHTML = `
+              <article class="bd-card bd-card-active">
+                <div class="bd-main">
+                  <div class="bd-visual-wrap">
+                    <div class="bd-layer">Visual Layer</div>
+                    <div class="bd-visual">${visual}</div>
+                  </div>
+                  <div class="bd-audio">
+                    <div class="bd-layer">Audio Layer</div>
+                    <div class="bd-quest-meta">
+                      <span class="bd-meta-chip">${memory.title}</span>
+                      <span class="bd-meta-chip">${memory.role}</span>
+                    </div>
+                    <p class="bd-audio-copy">${memory.log}</p>
+                    ${links}
+                  </div>
+                </div>
+              </article>
+            `;
             steps.forEach((step, idx) => {
               step.setAttribute('data-active', idx === activeIndex ? 'true' : 'false');
             });
-            if (!scrollToCard) return;
-            const card = cardsRoot.querySelector(`.bd-card[data-index="${activeIndex}"]`);
-            if (card instanceof HTMLElement) {
-              programmaticScroll = true;
-              card.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-              window.setTimeout(() => {
-                programmaticScroll = false;
-              }, 260);
-            }
           };
 
-          scrub.addEventListener('input', () => {
-            setIndex(Number(scrub.value), true);
-          });
+          const go = (delta) => {
+            activeIndex = (activeIndex + delta + memories.length) % memories.length;
+            renderCard();
+          };
 
-          steps.forEach((step) => {
-            step.addEventListener('click', () => {
-              setIndex(Number(step.getAttribute('data-index') || '0'), true);
+          steps.forEach((btn) => {
+            btn.addEventListener('click', () => {
+              activeIndex = Number(btn.getAttribute('data-index') || '0');
+              renderCard();
             });
           });
 
-          cardsRoot.addEventListener('scroll', () => {
-            syncScanline();
-            if (programmaticScroll) return;
-            const width = cardsRoot.clientWidth || 1;
-            const index = Math.round(cardsRoot.scrollLeft / width);
-            if (index !== activeIndex) {
-              setIndex(index, false);
+          const onArchiveKeydown = (event) => {
+            if (!document.body.classList.contains('sidequests-active')) {
+              return;
             }
-          });
+            if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              if (activeIndex >= memories.length - 1) {
+                if (!dispatchNavigationTo('CONTACT')) {
+                  dispatchNavigationTo('Contact');
+                }
+                return;
+              }
+              go(1);
+            } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              if (activeIndex <= 0) {
+                if (!dispatchNavigationTo('EXPERIENCE')) {
+                  dispatchNavigationTo('Experience');
+                }
+                return;
+              }
+              go(-1);
+            }
+          };
+          window.addEventListener('keydown', onArchiveKeydown, { capture: true });
 
-          syncScanline();
-          setIndex(0, false);
+          renderCard();
         };
 
         const dispatchNavigationKey = (key) => {
