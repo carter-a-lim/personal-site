@@ -53,3 +53,25 @@
 .timeline-panel .section-heading{margin-top:.25rem !important;padding-top:.2rem !important}
 /* Remove off-screen SIGNAL_SYNCED block */
 .timeline-sync{display:none !important}
+
+/* Codex runtime override: sidequest media must swap and remain full-frame */
+.sidequests-panel .quest-card-active .quest-photo{
+  height: clamp(240px, 42vh, 460px) !important;
+  background: #020816 !important;
+  background-image: none !important;
+  display: block !important;
+  padding: 0 !important;
+}
+.sidequests-panel .quest-card-active .quest-photo > img,
+.sidequests-panel .quest-card-active .quest-photo > video{
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: #020816 !important;
+}
+.sidequests-panel .quest-card-active .quest-photo > video{
+  pointer-events: none !important;
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "title": "High School Robot",
+    "role": "Mechanical Build",
+    "photo": "sidequests/robot/IMG_6041.jpg",
+    "mediaType": "image",
+    "secondaryMedia": {
+      "type": "video",
+      "src": "sidequests/robot/IMG_6046.mp4"
+    },
+    "log": "Custom VEX-style robot I designed and built in high school. Includes build photo + test run footage in one archive slide.",
+    "links": []
+  },
+  {
+    "title": "Pitch Competition",
+    "role": "Startup Sprint",
+    "photo": "signal-2026-02-27-164119.jpeg",
+    "mediaType": "image",
+    "log": "Placed 1st at the 2025 Cal Poly Elevator Pitch Competition with a 90-second live pitch for Communicare, an AI communication coach. Framed market viability, technical scalability, and AI integration under high pressure, then handled judge Q&A in real time. Secured $1,000 in seed funding/prize money and turned a compressed prep window into a complete deliverable sprint.",
+    "links": [
+      [
+        "Pitch Video",
+        "https://youtu.be/fwE4Xvotm8s"
+      ]
+    ]
+  },
+  {
+    "title": "Clash Royale Tournament",
+    "role": "Event + Strategy",
+    "photo": "IMG_0508.jpg",
+    "mediaType": "image",
+    "log": "Directed Cal Poly's first 2v2 Clash Royale tournament and handled logistics for 12 teams (30+ attendees), including venue planning and bracket operations. Drove turnout with multi-channel promotion across flyers, Discord, and social channels, while also organizing prize incentives. During the event, resolved live connectivity issues and kept match flow stable to maintain competitive pacing.",
+    "links": [
+      [
+        "LinkedIn",
+        "https://www.linkedin.com/in/carter-a-lim/"
+      ]
+    ]
+  },
+  {
+    "title": "Mustang Market Launch",
+    "role": "Build + Growth",
+    "photo": "IMG_6904.jpg",
+    "mediaType": "image",
+    "log": "Built and launched Mustang Market in a team of 3 over a two-week sprint from planning to public release. Reached 3,000+ visitors and 500+ users in the first 10 days, then pushed growth with social content that generated 50,000+ views. Ran fast post-launch feedback loops to prioritize fixes and feature iteration while usage was actively scaling.",
+    "links": [
+      [
+        "Live Site",
+        "https://mustang-market.com"
+      ],
+      [
+        "GitHub",
+        "https://github.com/carter-a-lim"
+      ]
+    ]
+  },
+  {
+    "title": "Vocaview",
+    "role": "Extension + Web Launch",
+    "photo": "vocaview-feature.png",
+    "mediaType": "image",
+    "log": "Deployed a browser extension + web app using a Vite, Supabase, Render, and Vercel stack. Built Figma wireframes and demo reels to reduce onboarding friction for early users and clarify product flow. Launch metrics hit 150+ visitors and 10+ users in week one, then grew to +150% visitors and +400% page views over the first two months.",
+    "links": [
+      [
+        "Live Site",
+        "https://vocaview.com"
+      ],
+      [
+        "GitHub",
+        "https://github.com/carter-a-lim"
+      ]
+    ]
+  }
+]
