@@ -1238,11 +1238,27 @@
           transition: opacity 620ms cubic-bezier(0.2, 0.7, 0.2, 1) !important;
         }
         body.mobile-scroll-mode #contact-flash-overlay {
-          z-index: 9700;
+          display: none !important;
+          opacity: 0 !important;
+          animation: none !important;
+        }
+        body.mobile-scroll-mode .wipe-container,
+        body.mobile-scroll-mode .wipe-band {
+          display: none !important;
+          opacity: 0 !important;
+          animation: none !important;
+        }
+        /* The fixed desktop braindance reader duplicates the native tab archive on phones. */
+        body.mobile-scroll-mode #bd-scrubber {
+          display: none !important;
+          pointer-events: none !important;
         }
         body.mobile-scroll-mode .contact-panel {
           justify-content: center !important;
           text-align: left !important;
+          z-index: 95 !important;
+          background: linear-gradient(90deg, rgba(1, 10, 20, 0.92) 0%, rgba(1, 10, 20, 0.78) 56%, rgba(1, 10, 20, 0.52) 100%) !important;
+          box-shadow: 0 0 50px rgba(0, 8, 18, 0.58) inset;
         }
         body.mobile-scroll-mode .contact-panel .social-row {
           justify-content: flex-start;
@@ -1432,6 +1448,49 @@
           cursor: grabbing;
         }
 
+        /* Keep the mobile timeline compact: dates live inside each entry card. */
+        body.mobile-scroll-mode .timeline-event {
+          display: block !important;
+          grid-template-columns: minmax(0, 1fr) !important;
+        }
+
+        body.mobile-scroll-mode .timeline-event .event-card {
+          position: relative;
+          z-index: 1;
+          width: 100%;
+          padding-right: 0.82rem !important;
+        }
+
+        body.mobile-scroll-mode .timeline-event .event-card h3 {
+          padding-right: 7.35rem;
+        }
+
+        body.mobile-scroll-mode .timeline-event .event-card span {
+          font-family: 'Rajdhani', sans-serif !important;
+          font-size: 0.9rem !important;
+          font-weight: 600;
+          letter-spacing: 0.15px;
+          line-height: 1.28;
+        }
+
+        body.mobile-scroll-mode .timeline-event .event-year {
+          position: absolute;
+          top: 0.72rem;
+          right: 0.7rem;
+          width: 6rem;
+          margin: 0 !important;
+          color: var(--neon-cyan);
+          font-size: 0.62rem !important;
+          line-height: 1.35;
+          letter-spacing: 0.7px;
+          text-align: right;
+          z-index: 2;
+          background: rgba(1, 14, 24, 0.86);
+          border: 1px solid rgba(0, 240, 255, 0.38);
+          padding: 0.22rem 0.28rem;
+          text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+        }
+
         .hero-text {
           width: 100%;
           max-width: 100%;
@@ -1456,8 +1515,8 @@
           display: block !important;
           width: 100% !important;
           max-width: 100% !important;
-          min-height: clamp(4.4rem, 24vw, 8rem);
-          line-height: 0.9 !important;
+          min-height: 0 !important;
+          line-height: 1 !important;
           text-align: center;
           margin: 0 auto !important;
           transform: none !important;
@@ -1466,7 +1525,21 @@
           overflow: visible;
         }
         body.mobile-scroll-mode .hero-text {
-          transform: none;
+          transform: translateY(-6svh) !important;
+        }
+
+        /* Keep the mobile continuation prompt close to the name and concise. */
+        .hero-text > div:last-child {
+          margin-top: 0 !important;
+          width: 100% !important;
+        }
+
+        .hero-text > div:last-child p {
+          margin-top: 0.3rem !important;
+          width: 100% !important;
+          font-size: clamp(0.52rem, 2.2vw, 0.7rem) !important;
+          letter-spacing: 0.1rem !important;
+          line-height: 1.2 !important;
         }
 
         /* Re-enable the position controls for the optional ?heroTune=1
@@ -1820,8 +1893,8 @@
 
           const routes = [
             ['.section-overlay', '#hero'],
-            ['.profile-panel', '#profile'],
             ['.timeline-panel', '#timeline'],
+            ['.profile-panel', '#profile'],
             ['.sidequests-panel', '#sidequests'],
             ['.contact-panel', '#contact'],
           ];
@@ -2213,6 +2286,9 @@
           };
 
           const onArchiveKeydown = (event) => {
+            if (document.body.classList.contains('mobile-scroll-mode')) {
+              return;
+            }
             if (!isSidequestsActive()) {
               return;
             }
@@ -2255,6 +2331,9 @@
           let sidequestsActiveLatch = false;
           let sidequestsEnteredAt = 0;
           const onArchiveWheel = (event) => {
+            if (document.body.classList.contains('mobile-scroll-mode')) {
+              return;
+            }
             const active = isSidequestsActive();
             if (!active) {
               sidequestsActiveLatch = false;
