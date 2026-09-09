@@ -135,6 +135,27 @@
       .intro-overlay {
         transition: opacity 260ms ease !important;
       }
+      .intro-actions {
+        display: grid;
+        justify-items: center;
+        gap: 0.65rem;
+      }
+      .intro-sound {
+        min-width: 9.75rem;
+        border: 1px solid rgba(174, 246, 255, 0.48);
+        background: rgba(0, 16, 30, 0.76);
+        color: rgba(216, 236, 255, 0.82);
+        font-family: "Share Tech Mono", monospace;
+        font-size: 0.66rem;
+        letter-spacing: 1.35px;
+        padding: 0.48rem 0.72rem;
+        cursor: pointer;
+      }
+      .intro-sound[aria-pressed="true"] {
+        border-color: var(--cyber-yellow);
+        background: rgba(252, 238, 9, 0.14);
+        color: var(--cyber-yellow);
+      }
       .cyber-environment::before {
         content: '';
         position: absolute;
