@@ -51,13 +51,64 @@
   ];
 
   const achievements = [
-    'Treasurer and Embedded Systems Lead for Cal Poly Mechatronics Club; handle budgeting, teach Arduino/Circuitry/C++, and guide PCB design.',
-    'Dean\'s List (x2) at Cal Poly; current affiliations include VocaView, Mechatronics Club, and Mustang Market.',
     '1st place in the 2025 Cal Poly Elevator Pitch Competition with Communicare; secured $1,000 in seed funding/prize money.',
-    'Winner of the 2026 Cal Poly x Ironsite Construction Innovation Challenge for HotHead; awarded $10,000.'
+    'Won $10,000 at the 2026 Cal Poly x Ironsite Construction Innovation Challenge with HotHead.',
+    'Treasurer and Embedded Systems Lead for Cal Poly Mechatronics Club; handle budgeting, teach Arduino/Circuitry/C++, and guide PCB design.',
+    'Dean\'s List (x2) at Cal Poly; current affiliations include VocaView, Mechatronics Club, and Mustang Market.'
   ];
 
   const projects = [];
+
+  const sideQuestArchives = [
+    {
+      title: 'DISK GOLF ROBOT CHALLENGE',
+      role: 'VEX ROBOT / MECHANICAL BUILD',
+      photo: 'sidequests/robot/IMG_6041.jpg',
+      log: 'Designed and built a custom VEX-style robot for a disk-golf-inspired challenge: score disks by shooting them into elevated hoops. Iterated on the intake, launcher, and drive system through repeated test runs.'
+    },
+    {
+      title: 'CAL POLY TOURNAMENT ORGANIZER',
+      role: 'EVENT PLANNING / MARKETING',
+      photo: 'IMG_0508.jpg',
+      log: 'Planned, organized, and marketed Cal Poly\'s first 2v2 Clash Royale tournament solo. Recruited 12 teams and 30+ attendees, created the promotional campaign, managed brackets and event logistics, and resolved live issues during the tournament.',
+      links: [['EVENT VIDEO', 'https://www.youtube.com/watch?v=VkPxaFniXcs']]
+    },
+    {
+      title: 'MUSTANG MARKET',
+      role: 'BUILD + GROWTH',
+      photo: 'IMG_6904.jpg',
+      log: 'Built and launched Mustang Market with a team of 3 over a two-week sprint, reaching 3,000+ visitors and 500+ users in the first 10 days.',
+      links: [['LIVE SITE', 'https://mustang-market.com']]
+    },
+    {
+      title: 'VOCAVIEW (SAAS)',
+      role: 'FOUNDER / FULL-STACK',
+      photo: 'vocaview-landing.png',
+      log: 'Deployed a browser extension and web app with Vite, Supabase, Render, and Vercel, then iterated on onboarding and early-user growth.',
+      links: [['LIVE SITE', 'https://vocaview.com']]
+    },
+    {
+      title: 'IRONSITE INNOVATION CHALLENGE',
+      role: 'THIRD PLACE / $10,000 AWARD',
+      photo: 'sidequests/ironsite-challenge.png',
+      log: 'Placed third in the 2026 Cal Poly x Ironsite Construction Innovation Challenge with HotHead and earned a $10,000 award for the team’s construction-tech concept.',
+      links: [['LINKEDIN POST / VIDEO', 'https://www.linkedin.com/posts/last-october-we-handed-100-students-a-real-ugcPost-7468699219684638720-SqZL/']]
+    },
+    {
+      title: 'ELEVATOR PITCH COMPETITION',
+      role: '1ST PLACE / COMMUNICARE',
+      photo: 'signal-2026-02-27-164119.jpeg',
+      log: 'Won the 2025 Cal Poly Elevator Pitch Competition with Communicare, an AI communication coach. Delivered a 90-second pitch, defended the product in live Q&A, and secured $1,000 in seed funding and prize money.',
+      links: [['PITCH VIDEO', 'https://youtu.be/fwE4Xvotm8s']]
+    },
+    {
+      title: 'MECHATRONICS CLUB',
+      role: 'EMBEDDED SYSTEMS LEAD',
+      photo: 'sidequests/mechatronics-club.png',
+      log: 'Serve as Treasurer and Embedded Systems Lead for Cal Poly Mechatronics Club. Manage budgeting, teach Arduino/Circuitry/C++, and guide members through PCB design and hands-on hardware builds.',
+      links: []
+    },
+  ];
 
   const setText = (selector, value) => {
     const node = document.querySelector(selector);
@@ -84,6 +135,34 @@
       ${project.bullets.map((bullet) => `<p>${bullet}</p>`).join('')}
     </article>
   `;
+
+  const renderSideQuestArchive = (index) => {
+    const archive = sideQuestArchives[index];
+    return `
+      <div class="sidequest-archive-shell" data-resume-sync="true">
+        <div class="sidequest-tabs" role="tablist" aria-label="Side quest archive">
+          ${sideQuestArchives.map((item, itemIndex) => `
+            <button class="sidequest-tab ${itemIndex === index ? 'is-active' : ''}" type="button" role="tab" aria-selected="${itemIndex === index}" data-sidequest-index="${itemIndex}">
+              <span class="sidequest-tab-index">${String(itemIndex + 1).padStart(2, '0')}</span>
+              <span>${item.title}</span>
+            </button>
+          `).join('')}
+        </div>
+        <article class="sidequest-archive-panel">
+          <div class="sidequest-archive-photo">
+            <img src="${archive.photo}" alt="${archive.title}" />
+            <span class="sidequest-archive-stamp">ARCHIVE // ${String(index + 1).padStart(2, '0')}</span>
+          </div>
+          <div class="sidequest-archive-copy">
+            <p class="sidequest-archive-role">${archive.role}</p>
+            <h3>${archive.title}</h3>
+            <p>${archive.log}</p>
+            ${archive.links?.length ? `<div class="sidequest-archive-links">${archive.links.map(([label, href]) => `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`).join('')}</div>` : ''}
+          </div>
+        </article>
+      </div>
+    `;
+  };
 
   const sync = () => {
     const profileStats = document.querySelector('.stand-stats-info');
@@ -124,6 +203,19 @@
       sideList.innerHTML = projects.map(renderProject).join('');
       sideList.style.display = 'none';
       sideList.dataset.resumeSync = 'true';
+    }
+
+    const questsGrid = document.querySelector('.sidequests-panel .quests-grid');
+    if (questsGrid && questsGrid.dataset.resumeSync !== 'true') {
+      questsGrid.innerHTML = renderSideQuestArchive(0);
+      questsGrid.dataset.resumeSync = 'true';
+      questsGrid.addEventListener('click', (event) => {
+        const tab = event.target.closest('[data-sidequest-index]');
+        if (!tab) return;
+        const index = Number(tab.dataset.sidequestIndex);
+        if (!Number.isInteger(index) || !sideQuestArchives[index]) return;
+        questsGrid.innerHTML = renderSideQuestArchive(index);
+      });
     }
 
     const sideRail = document.querySelector('.timeline-sideprojects');
@@ -206,6 +298,173 @@
         .event-year {
           overflow-wrap: anywhere;
         }
+        .sidequests-panel .quests-grid {
+          pointer-events: auto;
+          display: block;
+          position: static;
+          width: 100%;
+          max-width: 1100px;
+          margin: 0 auto;
+          transform: none !important;
+        }
+        .sidequest-archive-shell {
+          display: grid;
+          gap: 0.8rem;
+          width: min(100%, 1100px);
+        }
+        .sidequest-tabs {
+          display: flex;
+          gap: 0.35rem;
+          overflow-x: auto;
+          padding: 0.25rem 0.25rem 0.45rem;
+          scrollbar-width: none;
+        }
+        .sidequest-tabs::-webkit-scrollbar {
+          display: none;
+        }
+        .sidequest-tab {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          flex: 0 0 auto;
+          border: 1px solid rgba(0, 240, 255, 0.32);
+          border-bottom: 2px solid rgba(0, 240, 255, 0.52);
+          background: rgba(1, 12, 20, 0.82);
+          color: rgba(232, 230, 227, 0.72);
+          padding: 0.55rem 0.7rem;
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 0.64rem;
+          letter-spacing: 0.08rem;
+          white-space: nowrap;
+          cursor: pointer;
+          transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+        }
+        .sidequest-tab:hover,
+        .sidequest-tab.is-active {
+          color: var(--deep-black);
+          border-color: var(--cyber-yellow);
+          background: var(--cyber-yellow);
+        }
+        .sidequest-tab-index {
+          opacity: 0.65;
+          font-size: 0.56rem;
+        }
+        .sidequest-archive-panel {
+          display: grid;
+          grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+          column-gap: clamp(1rem, 2vw, 1.5rem);
+          min-height: min(52vh, 500px);
+          border: 1px solid rgba(0, 240, 255, 0.42);
+          background: transparent;
+          box-shadow: none;
+          clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+        }
+        .sidequest-archive-photo {
+          position: relative;
+          grid-column: 2;
+          grid-row: 1;
+          z-index: 1;
+          min-height: 320px;
+          overflow: hidden;
+          border-right: 1px solid rgba(0, 240, 255, 0.35);
+          background: #020816;
+        }
+        .sidequest-archive-photo img {
+          width: 100%;
+          height: 100%;
+          display: block;
+          object-fit: cover;
+          object-position: center top;
+          filter: saturate(0.9) contrast(1.05);
+        }
+        .sidequest-archive-photo::after {
+          content: none;
+        }
+        .sidequest-archive-stamp {
+          position: absolute;
+          left: 0.7rem;
+          bottom: 0.7rem;
+          padding: 0.25rem 0.45rem;
+          border: 1px solid rgba(252, 238, 9, 0.72);
+          background: rgba(2, 8, 18, 0.78);
+          color: var(--cyber-yellow);
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 0.58rem;
+          letter-spacing: 0.08rem;
+        }
+        .sidequest-archive-copy {
+          grid-column: 1;
+          grid-row: 1;
+          position: relative;
+          isolation: isolate;
+          z-index: 2;
+          overflow: visible;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: clamp(2rem, 4vw, 4rem);
+        }
+        .sidequest-archive-copy::before {
+          content: '';
+          position: absolute;
+          z-index: 0;
+          inset: clamp(-1.5rem, -2vw, -1rem);
+          pointer-events: none;
+          background: radial-gradient(ellipse at 50% 50%, rgba(1, 10, 18, 0.98) 0%, rgba(1, 10, 18, 0.88) 42%, rgba(1, 10, 18, 0.46) 68%, rgba(1, 10, 18, 0.12) 84%, transparent 100%);
+        }
+        .sidequest-archive-copy > * {
+          position: relative;
+        }
+        .sidequest-archive-role {
+          margin: 0 0 0.7rem;
+          color: var(--cyber-yellow);
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 0.68rem;
+          letter-spacing: 0.12rem;
+        }
+        .sidequest-archive-copy h3 {
+          margin: 0 0 1rem;
+          color: #aef6ff;
+          font-family: Orbitron, sans-serif;
+          font-size: clamp(1.1rem, 2.2vw, 1.8rem);
+          letter-spacing: 0.08rem;
+        }
+        .sidequest-archive-copy > p:last-child {
+          margin: 0;
+          max-width: 34rem;
+          color: rgba(232, 230, 227, 0.82);
+          font-family: Rajdhani, sans-serif;
+          font-size: clamp(1rem, 1.5vw, 1.18rem);
+          line-height: 1.55;
+        }
+        .sidequest-archive-links {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.7rem;
+          margin-top: 1.6rem;
+        }
+        .sidequest-archive-links a {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 10rem;
+          min-height: 3.25rem;
+          padding: 0.85rem 1.25rem;
+          border: 1px solid rgba(0, 240, 255, 0.58);
+          color: #9cf4ff;
+          background: rgba(0, 12, 20, 0.9);
+          font-family: 'Share Tech Mono', monospace;
+          font-size: clamp(0.72rem, 1vw, 0.9rem);
+          letter-spacing: 0.12rem;
+          text-decoration: none;
+          transition: transform 180ms ease, color 180ms ease, background 180ms ease, border-color 180ms ease;
+        }
+        .sidequest-archive-links a:hover {
+          transform: translateY(-2px);
+          color: #0b0f14;
+          background: linear-gradient(90deg, #00f0ff, #8ff7ff);
+          border-color: rgba(0, 240, 255, 0.85);
+        }
         @media (max-width: 900px) {
           .timeline-panel {
             padding-top: max(6.5rem, calc(env(safe-area-inset-top) + 5.5rem)) !important;
@@ -215,6 +474,28 @@
           }
           .timeline-event {
             grid-template-columns: 100px minmax(0, 1fr) !important;
+          }
+          .sidequest-archive-panel {
+            grid-template-columns: 1fr;
+            row-gap: 0.8rem;
+          }
+          .sidequest-archive-photo {
+            grid-column: 1;
+            grid-row: auto;
+            min-height: 220px;
+            max-height: 38vh;
+            border-right: 0;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.35);
+          }
+          .sidequest-archive-copy {
+            grid-column: 1;
+            grid-row: auto;
+          }
+          .sidequest-archive-copy::before {
+            inset: 0;
+          }
+          .sidequest-archive-photo::after {
+            content: none;
           }
         }
       `;

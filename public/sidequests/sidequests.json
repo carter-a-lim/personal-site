@@ -1,22 +1,74 @@
 [
   {
-    "title": "High School Robot",
-    "role": "Mechanical Build",
+    "title": "Disk Golf Robot Challenge",
+    "role": "VEX Robot / Mechanical Build",
     "photo": "sidequests/robot/IMG_6041.jpg",
     "mediaType": "image",
     "secondaryMedia": {
       "type": "video",
-      "src": "sidequests/robot/IMG_6046.mp4"
+      "src": "sidequests/robot/IMG_6046-last-3s.mp4"
     },
-    "log": "Custom VEX-style robot I designed and built in high school. Includes build photo + test run footage in one archive slide.",
+    "log": "Designed and built a custom VEX-style robot for a disk-golf-inspired challenge: score disks by shooting them into elevated hoops. Iterated on the intake, launcher, and drive system through repeated test runs.",
     "links": []
   },
   {
-    "title": "Pitch Competition",
-    "role": "Startup Sprint",
+    "title": "Cal Poly Tournament Organizer",
+    "role": "Event Planning / Marketing",
+    "photo": "IMG_0508.jpg",
+    "mediaType": "image",
+    "log": "Planned, organized, and marketed Cal Poly's first 2v2 Clash Royale tournament solo. Recruited 12 teams and 30+ attendees, created the promotional campaign, managed brackets and event logistics, and resolved live issues during the tournament.",
+    "links": [
+      [
+        "Event Video",
+        "https://www.youtube.com/watch?v=VkPxaFniXcs"
+      ]
+    ]
+  },
+  {
+    "title": "Mustang Market",
+    "role": "Product / Growth",
+    "photo": "IMG_6904.jpg",
+    "mediaType": "image",
+    "log": "Built and launched Mustang Market in a team of 3 over a two-week sprint from planning to public release. Reached 3,000+ visitors and 500+ users in the first 10 days, then pushed growth with social content that generated 50,000+ views. Ran fast post-launch feedback loops to prioritize fixes and feature iteration while usage was actively scaling.",
+    "links": [
+      [
+        "Live Site",
+        "https://mustang-market.com"
+      ]
+    ]
+  },
+  {
+    "title": "VocaView (SAAS)",
+    "role": "Founder / Full-Stack",
+    "photo": "vocaview-landing.png",
+    "mediaType": "image",
+    "log": "Deployed a browser extension + web app using a Vite, Supabase, Render, and Vercel stack. Built Figma wireframes and demo reels to reduce onboarding friction for early users and clarify product flow. Launch metrics hit 150+ visitors and 10+ users in week one, then grew to +150% visitors and +400% page views over the first two months.",
+    "links": [
+      [
+        "Live Site",
+        "https://vocaview.com"
+      ]
+    ]
+  },
+  {
+    "title": "Ironsite Innovation Challenge",
+    "role": "Third Place / $10,000 Award",
+    "photo": "sidequests/ironsite-challenge.png",
+    "mediaType": "image",
+    "log": "Placed third in the 2026 Cal Poly x Ironsite Construction Innovation Challenge with HotHead and earned a $10,000 award for the team’s construction-tech concept.",
+    "links": [
+      [
+        "LinkedIn Post / Video",
+        "https://www.linkedin.com/posts/last-october-we-handed-100-students-a-real-ugcPost-7468699219684638720-SqZL/"
+      ]
+    ]
+  },
+  {
+    "title": "Elevator Pitch Competition",
+    "role": "1st Place / Communicare",
     "photo": "signal-2026-02-27-164119.jpeg",
     "mediaType": "image",
-    "log": "Placed 1st at the 2025 Cal Poly Elevator Pitch Competition with a 90-second live pitch for Communicare, an AI communication coach. Framed market viability, technical scalability, and AI integration under high pressure, then handled judge Q&A in real time. Secured $1,000 in seed funding/prize money and turned a compressed prep window into a complete deliverable sprint.",
+    "log": "Won the 2025 Cal Poly Elevator Pitch Competition with Communicare, an AI communication coach. Delivered a 90-second pitch, defended the product in live Q&A, and secured $1,000 in seed funding and prize money.",
     "links": [
       [
         "Pitch Video",
@@ -25,50 +77,11 @@
     ]
   },
   {
-    "title": "Clash Royale Tournament",
-    "role": "Event + Strategy",
-    "photo": "IMG_0508.jpg",
+    "title": "Mechatronics Club",
+    "role": "Embedded Systems Lead",
+    "photo": "sidequests/mechatronics-club.png",
     "mediaType": "image",
-    "log": "Directed Cal Poly's first 2v2 Clash Royale tournament and handled logistics for 12 teams (30+ attendees), including venue planning and bracket operations. Drove turnout with multi-channel promotion across flyers, Discord, and social channels, while also organizing prize incentives. During the event, resolved live connectivity issues and kept match flow stable to maintain competitive pacing.",
-    "links": [
-      [
-        "LinkedIn",
-        "https://www.linkedin.com/in/carter-a-lim/"
-      ]
-    ]
-  },
-  {
-    "title": "Mustang Market Launch",
-    "role": "Build + Growth",
-    "photo": "IMG_6904.jpg",
-    "mediaType": "image",
-    "log": "Built and launched Mustang Market in a team of 3 over a two-week sprint from planning to public release. Reached 3,000+ visitors and 500+ users in the first 10 days, then pushed growth with social content that generated 50,000+ views. Ran fast post-launch feedback loops to prioritize fixes and feature iteration while usage was actively scaling.",
-    "links": [
-      [
-        "Live Site",
-        "https://mustang-market.com"
-      ],
-      [
-        "GitHub",
-        "https://github.com/carter-a-lim"
-      ]
-    ]
-  },
-  {
-    "title": "Vocaview",
-    "role": "Extension + Web Launch",
-    "photo": "vocaview-feature.png",
-    "mediaType": "image",
-    "log": "Deployed a browser extension + web app using a Vite, Supabase, Render, and Vercel stack. Built Figma wireframes and demo reels to reduce onboarding friction for early users and clarify product flow. Launch metrics hit 150+ visitors and 10+ users in week one, then grew to +150% visitors and +400% page views over the first two months.",
-    "links": [
-      [
-        "Live Site",
-        "https://vocaview.com"
-      ],
-      [
-        "GitHub",
-        "https://github.com/carter-a-lim"
-      ]
-    ]
+    "log": "Serve as Treasurer and Embedded Systems Lead for Cal Poly Mechatronics Club. Manage budgeting, teach Arduino/Circuitry/C++, and guide members through PCB design and hands-on hardware builds.",
+    "links": []
   }
 ]

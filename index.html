@@ -497,20 +497,71 @@
         accent-color: #00f0ff;
       }
       .bd-step-track {
-        display: grid;
-        grid-template-columns: repeat(var(--bd-steps, 3), minmax(0, 1fr));
+        display: flex;
         gap: 0.35rem;
         margin: 0;
+        overflow-x: auto;
+        align-items: flex-end;
+        padding: 0.15rem 0.15rem 0;
+        scrollbar-width: none;
+      }
+      .bd-step-track::-webkit-scrollbar {
+        display: none;
       }
       .bd-step {
-        height: 7px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        flex: 0 0 auto;
+        min-height: 2.15rem;
         border: 1px solid rgba(0, 240, 255, 0.42);
+        border-bottom: 0;
+        border-radius: 9px 9px 0 0;
         background: rgba(0, 30, 44, 0.45);
+        color: rgba(174, 246, 255, 0.76);
+        padding: 0.45rem 0.7rem;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
         cursor: pointer;
+        transition: color 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
       }
       .bd-step[data-active='true'] {
-        background: linear-gradient(90deg, #00f0ff, #fcee09);
-        box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        position: relative;
+        z-index: 2;
+        color: #aef6ff;
+        border-color: rgba(0, 240, 255, 0.42);
+        background: rgba(1, 10, 18, 0.92);
+        box-shadow: 0 -3px 14px rgba(0, 240, 255, 0.14), inset 0 2px 0 #fcee09;
+        margin-bottom: -1px;
+      }
+      .bd-step:hover {
+        color: #fcee09;
+        border-color: #fcee09;
+      }
+      .bd-step[data-active='true']:hover {
+        color: #aef6ff;
+      }
+      .bd-tab-index {
+        opacity: 0.62;
+        font-size: 0.54rem;
+      }
+      #bd-scrubber .bd-shell {
+        grid-template-rows: auto minmax(0, 1fr);
+      }
+      #bd-scrubber .bd-topline {
+        display: none;
+      }
+      #bd-scrubber .bd-step-track {
+        border-bottom: 1px solid rgba(0, 240, 255, 0.34);
+      }
+      #bd-scrubber .bd-layer,
+      #bd-scrubber .bd-quest-meta {
+        display: none !important;
+      }
+      #bd-scrubber .bd-audio {
+        padding-top: 0.35rem;
       }
       .bd-cards {
         display: grid;
@@ -690,6 +741,190 @@
         }
         .bd-card.bd-card-portrait .bd-main {
           grid-template-columns: minmax(0, 1fr);
+        }
+      }
+      /* Sidequest archive: expand the workspace and dock browser tabs on the right. */
+      #bd-scrubber .bd-shell {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+        gap: 1rem;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+        grid-template-rows: minmax(0, 1fr);
+      }
+      #bd-scrubber .bd-step-track {
+        display: flex !important;
+        grid-column: 2;
+        grid-row: 1;
+        grid-template-columns: none !important;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+        border: 0;
+        margin: 0 !important;
+        padding: 0.2rem 0 0.2rem 0.8rem;
+      }
+      #bd-scrubber .bd-step {
+        width: 100%;
+        min-height: 3.4rem;
+        justify-content: flex-start;
+        border: 1px solid rgba(0, 240, 255, 0.34);
+        border-left: 3px solid rgba(0, 240, 255, 0.5);
+        border-radius: 0 10px 10px 0;
+        padding: 0.75rem 0.9rem;
+        font-size: 0.68rem;
+        text-align: left;
+      }
+      #bd-scrubber .bd-step[data-active='true'] {
+        border-color: rgba(0, 240, 255, 0.52);
+        border-left-color: #fcee09;
+        border-bottom: 1px solid rgba(0, 240, 255, 0.52);
+        background: rgba(1, 10, 18, 0.92);
+        box-shadow: -5px 0 18px rgba(0, 240, 255, 0.12), inset 0 0 0 1px rgba(252, 238, 9, 0.16);
+        margin: 0;
+      }
+      #bd-scrubber .bd-card-host {
+        grid-column: 1;
+        grid-row: 1;
+        min-width: 0;
+      }
+      #bd-scrubber .bd-card {
+        height: 100%;
+        border: 0;
+        background: transparent;
+        padding: 0;
+      }
+      #bd-scrubber .bd-main {
+        height: 100%;
+        grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1.18fr) !important;
+        gap: clamp(1.2rem, 3vw, 3.5rem);
+        align-items: center;
+      }
+      #bd-scrubber .bd-audio {
+        grid-column: 1;
+        grid-row: 1;
+        padding: 1rem 0;
+        position: relative;
+        isolation: isolate;
+        z-index: 2;
+        overflow: visible;
+      }
+      #bd-scrubber .bd-audio::before {
+        content: '';
+        position: absolute;
+        z-index: 0;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(ellipse at 48% 50%, rgba(1, 10, 18, 0.99) 0%, rgba(1, 10, 18, 0.97) 42%, rgba(1, 10, 18, 0.72) 66%, rgba(1, 10, 18, 0.28) 84%, transparent 100%);
+      }
+      #bd-scrubber .bd-audio > * {
+        position: relative;
+        z-index: 1;
+      }
+      #bd-scrubber .bd-visual-wrap {
+        grid-column: 2;
+        grid-row: 1;
+        position: relative;
+        z-index: 1;
+      }
+      #bd-scrubber .bd-visual {
+        height: min(72vh, 760px);
+      }
+      #bd-scrubber .bd-audio-copy {
+        max-width: 38rem;
+        font-size: clamp(1.05rem, 1.55vw, 1.35rem);
+        line-height: 1.55;
+      }
+      #bd-scrubber .bd-audio-kicker {
+        margin: 0 0 0.6rem;
+        color: var(--cyber-yellow);
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.14rem;
+        text-transform: uppercase;
+      }
+      #bd-scrubber .bd-audio-title {
+        margin: 0 0 1rem;
+        color: #aef6ff;
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(1.25rem, 2.5vw, 2.15rem);
+        letter-spacing: 0.08rem;
+        line-height: 1.15;
+      }
+      #bd-scrubber .bd-links {
+        gap: 0.75rem;
+        margin-top: 1.6rem;
+        align-items: center;
+      }
+      #bd-scrubber .bd-link-chip {
+        min-width: 10rem;
+        min-height: 3.25rem;
+        justify-content: center;
+        padding: 0.85rem 1.25rem;
+        font-size: clamp(0.72rem, 1vw, 0.9rem);
+        letter-spacing: 0.12rem;
+        border-color: rgba(0, 240, 255, 0.58);
+        background: rgba(0, 12, 20, 0.88);
+        transition: transform 180ms ease, color 180ms ease, background 180ms ease, border-color 180ms ease;
+      }
+      #bd-scrubber .bd-link-chip:hover {
+        transform: translateY(-2px);
+      }
+      @media (max-width: 900px) {
+        #bd-scrubber .bd-shell {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: auto minmax(0, 1fr);
+          gap: 0.8rem;
+        }
+        #bd-scrubber .bd-step-track {
+          display: flex !important;
+          grid-column: 1;
+          grid-row: 1;
+          grid-template-columns: none !important;
+          flex-direction: row;
+          align-items: flex-end;
+          overflow-x: auto;
+          overflow-y: hidden;
+          border-bottom: 1px solid rgba(0, 240, 255, 0.34);
+          margin: 0 !important;
+          padding: 0.15rem 0.15rem 0;
+        }
+        #bd-scrubber .bd-step {
+          width: auto;
+          min-width: 11rem;
+          min-height: 2.7rem;
+          border: 1px solid rgba(0, 240, 255, 0.34);
+          border-bottom: 0;
+          border-left: 1px solid rgba(0, 240, 255, 0.34);
+          border-radius: 9px 9px 0 0;
+          padding: 0.6rem 0.7rem;
+        }
+        #bd-scrubber .bd-step[data-active='true'] {
+          border-color: rgba(0, 240, 255, 0.52);
+          border-bottom: 0;
+          border-left-color: rgba(0, 240, 255, 0.52);
+        }
+        #bd-scrubber .bd-card-host {
+          grid-column: 1;
+          grid-row: 2;
+        }
+        #bd-scrubber .bd-main {
+          height: auto;
+          grid-template-columns: minmax(0, 1fr) !important;
+          gap: 1rem;
+        }
+        #bd-scrubber .bd-audio,
+        #bd-scrubber .bd-visual-wrap {
+          grid-column: 1;
+          grid-row: auto;
+        }
+        #bd-scrubber .bd-visual {
+          height: min(48vh, 460px);
         }
       }
       /* Critical banner: auto-fade out after 3s even if active class remains */
@@ -1515,10 +1750,10 @@
           if (!(host instanceof HTMLElement)) {
             return;
           }
-          if ((host.dataset.readyVersion || '').startsWith('3')) {
+          if ((host.dataset.readyVersion || '').startsWith('4')) {
             return;
           }
-          host.dataset.readyVersion = '3-loading';
+          host.dataset.readyVersion = '4-loading';
           if (typeof host.__bdCleanup === 'function') {
             host.__bdCleanup();
           }
@@ -1536,7 +1771,7 @@
             {
               title: 'Robot Test Run',
               role: 'Field Footage',
-              photo: 'sidequests/robot/IMG_6046.mp4',
+              photo: 'sidequests/robot/IMG_6046-last-3s.mp4',
               mediaType: 'video',
               log: 'Field test footage from the same build. Captures movement and mechanisms in action.',
               links: [],
@@ -1555,7 +1790,7 @@
 
           let activeIndex = 0;
           host.dataset.ready = '1';
-          host.dataset.readyVersion = '3';
+          host.dataset.readyVersion = '4';
           host.innerHTML = `
             <div class="bd-shell">
               <div class="bd-topline">
@@ -1576,7 +1811,7 @@
           stepTrack.innerHTML = memories
             .map(
               (_, idx) =>
-                `<button type="button" class="bd-step" data-index="${idx}" data-active="${idx === 0 ? 'true' : 'false'}" aria-label="Jump to memory ${idx + 1}"></button>`
+                `<button type="button" class="bd-step" data-index="${idx}" data-active="${idx === 0 ? 'true' : 'false'}" aria-label="Open ${memories[idx].title}"><span class="bd-tab-index">${String(idx + 1).padStart(2, '0')}</span><span>${memories[idx].title}</span></button>`
             )
             .join('');
           stepTrack.style.setProperty('--bd-steps', String(memories.length));
@@ -1618,11 +1853,8 @@
                     <div class="bd-visual">${visual}</div>
                   </div>
                   <div class="bd-audio">
-                    <div class="bd-layer">Audio Layer</div>
-                    <div class="bd-quest-meta">
-                      <span class="bd-meta-chip">${memory.title}</span>
-                      <span class="bd-meta-chip">${memory.role}</span>
-                    </div>
+                    <p class="bd-audio-kicker">${memory.role}</p>
+                    <h4 class="bd-audio-title">${memory.title}</h4>
                     <p class="bd-audio-copy">${memory.log}</p>
                     ${links}
                   </div>
