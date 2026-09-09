@@ -1490,6 +1490,21 @@
           line-height: 1.28;
         }
 
+        body.mobile-scroll-mode .profile-body {
+          display: contents !important;
+        }
+
+        body.mobile-scroll-mode .profile-body .section-label {
+          display: none !important;
+        }
+
+        body.mobile-scroll-mode .profile-body .section-heading {
+          grid-column: 1;
+          order: -1;
+          align-self: stretch;
+          margin-bottom: 1rem !important;
+        }
+
         body.mobile-scroll-mode .timeline-event .event-year {
           position: absolute;
           top: 0.72rem;

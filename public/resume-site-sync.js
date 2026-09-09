@@ -186,6 +186,7 @@
 
     setText('.profile-desc', 'Computer engineering student building mobile apps, developer tools, and AI-powered products from prototype to launch.');
     setText('.profile-body .badge', 'BUILDER - FOUNDER - SYSTEMS ENGINEER');
+    setText('.profile-body .section-heading', 'TECHNICAL SKILLS');
     setText('.timeline-panel .section-heading', 'EXPERIENCE');
     setText('.sidequests-panel .section-heading', 'SIDEQUESTS');
 
