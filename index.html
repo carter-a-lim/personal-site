@@ -1132,6 +1132,123 @@
         }
       }
 
+      /* Mobile becomes a single scroll narrative instead of a fixed scene navigator. */
+      @media (max-width: 900px) {
+        html.mobile-scroll-mode,
+        body.mobile-scroll-mode {
+          overflow-x: hidden !important;
+          overflow-y: hidden !important;
+        }
+        body.mobile-scroll-mode #root {
+          width: 100%;
+          height: 100svh !important;
+          min-height: 0;
+          overflow-x: hidden !important;
+          overflow-y: auto !important;
+          touch-action: pan-y !important;
+          overscroll-behavior-y: contain;
+          -webkit-overflow-scrolling: touch;
+        }
+        body.mobile-scroll-mode .cyber-environment {
+          position: fixed !important;
+          inset: 0 !important;
+          z-index: 0 !important;
+          pointer-events: none !important;
+        }
+        body.mobile-scroll-mode .cyber-city {
+          z-index: 0 !important;
+          height: 62svh;
+          opacity: 0.98;
+          filter: saturate(1.25) contrast(1.08);
+        }
+        body.mobile-scroll-mode .canvas-blur {
+          display: none !important;
+          pointer-events: none !important;
+        }
+        body.mobile-scroll-mode .canvas-normal {
+          display: block !important;
+          position: fixed !important;
+          inset: 0 !important;
+          z-index: 1 !important;
+          opacity: 0.62 !important;
+          visibility: visible !important;
+          pointer-events: none !important;
+        }
+        body.mobile-scroll-mode .hud {
+          position: sticky !important;
+          top: 0;
+          width: 100%;
+          height: auto !important;
+          min-height: 0;
+          padding: 0.75rem 0.9rem 0.6rem !important;
+          background: linear-gradient(180deg, rgba(3, 10, 20, 0.96), rgba(3, 10, 20, 0.68), transparent);
+          backdrop-filter: blur(7px);
+          pointer-events: none;
+          z-index: 300 !important;
+        }
+        body.mobile-scroll-mode .hud-top {
+          display: block;
+        }
+        body.mobile-scroll-mode .hud-top .logo {
+          display: inline-block;
+          font-size: 1.35rem !important;
+        }
+        body.mobile-scroll-mode .nav-tags {
+          display: none !important;
+        }
+        body.mobile-scroll-mode .section-overlay {
+          position: relative !important;
+          inset: auto !important;
+          min-height: 100svh;
+          padding: 5rem 1rem 3rem;
+          pointer-events: none;
+          z-index: 10;
+          touch-action: pan-y !important;
+        }
+        body.mobile-scroll-mode .profile-panel,
+        body.mobile-scroll-mode .timeline-panel,
+        body.mobile-scroll-mode .sidequests-panel,
+        body.mobile-scroll-mode .contact-panel,
+        body.mobile-scroll-mode .projects-panel {
+          position: relative !important;
+          inset: auto !important;
+          width: 100%;
+          min-height: 100svh;
+          height: auto !important;
+          padding: 5.5rem 1rem 3.5rem !important;
+          justify-content: flex-start !important;
+          align-items: stretch !important;
+          overflow: visible !important;
+          opacity: 1 !important;
+          transform: none !important;
+          pointer-events: auto !important;
+          z-index: 20 !important;
+          touch-action: pan-y !important;
+        }
+        body.mobile-scroll-mode .profile-panel:not(.visible) .profile-layout,
+        body.mobile-scroll-mode .profile-panel:not(.visible) .profile-body,
+        body.mobile-scroll-mode .profile-panel:not(.visible) .profile-tech-side {
+          pointer-events: auto !important;
+        }
+        body.mobile-scroll-mode .timeline-panel:after {
+          position: fixed;
+          pointer-events: none;
+        }
+        body.mobile-scroll-mode #contact-video-scene {
+          transition: opacity 620ms cubic-bezier(0.2, 0.7, 0.2, 1) !important;
+        }
+        body.mobile-scroll-mode #contact-flash-overlay {
+          z-index: 9700;
+        }
+        body.mobile-scroll-mode .contact-panel {
+          justify-content: center !important;
+          text-align: left !important;
+        }
+        body.mobile-scroll-mode .contact-panel .social-row {
+          justify-content: flex-start;
+        }
+      }
+
       /* Mobile-first runtime layout fixes */
       @media (max-width: 900px) {
         :root {
@@ -1170,7 +1287,7 @@
         }
 
         .nav-tags {
-          display: flex !important;
+          display: none !important;
           gap: 0.45rem !important;
           overflow-x: auto;
           white-space: nowrap;
@@ -1335,16 +1452,81 @@
         }
 
         .hero-name {
-          align-items: flex-start !important;
-          width: 760px !important;
-          max-width: 760px !important;
-          line-height: 0.85 !important;
+          position: relative;
+          display: block !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          min-height: clamp(4.4rem, 24vw, 8rem);
+          line-height: 0.9 !important;
+          text-align: center;
           margin: 0 auto !important;
-          transform-origin: top left !important;
-          transform:
-            translate3d(var(--hero-mobile-x), var(--hero-mobile-y), 0)
+          transform: none !important;
+          animation: none !important;
+          text-shadow: none !important;
+          overflow: visible;
+        }
+        body.mobile-scroll-mode .hero-text {
+          transform: none;
+        }
+
+        /* Re-enable the position controls for the optional ?heroTune=1
+           calibration mode without making the production title draggable. */
+        html.hero-tune-mode .hero-name {
+          transform: translate3d(var(--hero-mobile-x), var(--hero-mobile-y), 0)
             scale(var(--hero-mobile-scale)) !important;
-          will-change: transform;
+          transform-origin: center top !important;
+          cursor: grab !important;
+          pointer-events: auto !important;
+        }
+
+        html.hero-tune-mode .hero-text {
+          pointer-events: auto !important;
+        }
+
+        html.hero-tune-mode .hero-name:active {
+          cursor: grabbing !important;
+        }
+
+        html.mobile-scroll-mode:not(.hero-tune-mode) .hero-name {
+          transform: translate3d(var(--hero-drag-x, 0px), var(--hero-drag-y, 0px), 0)
+            !important;
+          cursor: grab !important;
+          pointer-events: auto !important;
+          touch-action: pan-y !important;
+        }
+
+        html.mobile-scroll-mode:not(.hero-tune-mode) .hero-text {
+          pointer-events: auto !important;
+        }
+
+        html.mobile-scroll-mode:not(.hero-tune-mode) .hero-name:active {
+          cursor: grabbing !important;
+        }
+
+        /* The desktop hero is a layered, art-directed composition. On a phone,
+           keep the identity intact with one fluid lockup instead of allowing
+           its independently transformed letters to collide or clip. */
+        .hero-name > * {
+          display: none !important;
+        }
+
+        .hero-name::before {
+          content: 'CARTER LIM';
+          display: block;
+          width: 100%;
+          padding: 0 0.25rem;
+          color: var(--cyber-yellow);
+          font-family: Orbitron, sans-serif;
+          font-size: clamp(1.9rem, 9.4vw, 4.2rem);
+          font-weight: 900;
+          letter-spacing: clamp(0.04rem, 0.55vw, 0.2rem);
+          line-height: 0.92;
+          white-space: nowrap;
+          text-align: center;
+          text-shadow: 3px 3px 0 rgba(0, 255, 102, 0.38),
+            -2px -2px 0 rgba(0, 200, 80, 0.24),
+            0 0 24px rgba(252, 238, 9, 0.28);
+          overflow: hidden;
         }
 
         .hero-letters-container {
@@ -1628,6 +1810,88 @@
           queueSync();
         };
 
+        const installMobileScrollExperience = () => {
+          if (!window.matchMedia('(max-width: 900px)').matches || document.body.dataset.mobileScrollReady === 'true') {
+            return;
+          }
+          document.body.dataset.mobileScrollReady = 'true';
+          document.documentElement.classList.add('mobile-scroll-mode');
+          document.body.classList.add('mobile-scroll-mode');
+
+          const routes = [
+            ['.section-overlay', '#hero'],
+            ['.profile-panel', '#profile'],
+            ['.timeline-panel', '#timeline'],
+            ['.sidequests-panel', '#sidequests'],
+            ['.contact-panel', '#contact'],
+          ];
+          const flash = document.getElementById('contact-flash-overlay');
+          let currentRoute = '';
+          const activateRoute = (hash) => {
+            if (!hash || hash === currentRoute) return;
+            currentRoute = hash;
+            const link = document.querySelector(`.nav-tags a[href="${hash}"]`);
+            if (link && link.getAttribute('data-active') !== 'true') {
+              link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+            }
+            if (hash === '#contact' && flash instanceof HTMLElement) {
+              flash.classList.remove('active');
+              void flash.offsetWidth;
+              flash.classList.add('active');
+              window.setTimeout(() => flash.classList.remove('active'), 720);
+            }
+          };
+
+          const observer = new IntersectionObserver((entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+            if (!visible) return;
+            const route = routes.find(([selector]) => visible.target.matches(selector));
+            if (route) activateRoute(route[1]);
+          }, { threshold: [0.45, 0.65] });
+          routes.forEach(([selector]) => {
+            const section = document.querySelector(selector);
+            if (section) observer.observe(section);
+          });
+
+          // Some mobile browsers do not deliver an IntersectionObserver update
+          // when a fixed-scene panel is switched to normal flow during boot.
+          // Keep the active scene and contact transition in sync with scrolling
+          // as a fallback, without changing the document's native scroll.
+          let scrollFrame = 0;
+          const syncRouteFromScroll = () => {
+            scrollFrame = 0;
+            const viewportH = window.innerHeight || document.documentElement.clientHeight;
+            const visible = routes
+              .map(([selector, hash]) => {
+                const section = document.querySelector(selector);
+                if (!section) return null;
+                const rect = section.getBoundingClientRect();
+                const overlap = Math.max(0, Math.min(rect.bottom, viewportH) - Math.max(rect.top, 0));
+                return { hash, score: overlap / Math.max(1, Math.min(rect.height, viewportH)) };
+              })
+              .filter(Boolean)
+              .sort((a, b) => b.score - a.score)[0];
+            if (visible && visible.score > 0.35) activateRoute(visible.hash);
+          };
+          const queueScrollRouteSync = () => {
+            if (!scrollFrame) scrollFrame = window.requestAnimationFrame(syncRouteFromScroll);
+          };
+          const mobileScroller = document.getElementById('root');
+          mobileScroller?.addEventListener('scroll', queueScrollRouteSync, { passive: true });
+          queueScrollRouteSync();
+
+          // Let the document scroll naturally; the desktop scene wheel handler must not hijack it.
+          document.addEventListener('wheel', (event) => {
+            if (document.body.classList.contains('mobile-scroll-mode')) {
+              event.preventDefault();
+              mobileScroller?.scrollBy({ top: event.deltaY, left: event.deltaX, behavior: 'auto' });
+              event.stopImmediatePropagation();
+            }
+          }, { capture: true, passive: false });
+        };
+
         const preloadAsset = async (assetPath) => {
           const response = await fetch(toAssetUrl(assetPath), { cache: 'force-cache' });
           if (!response.ok) {
@@ -1746,6 +2010,57 @@
           queueApply();
           window.setTimeout(queueApply, 250);
           window.setTimeout(queueApply, 700);
+        };
+
+        const installMobileHeroDrag = () => {
+          if (!window.matchMedia('(max-width: 900px)').matches) return;
+
+          const rootStyle = document.documentElement.style;
+          let hero = null;
+          let dragging = false;
+          let startX = 0;
+          let startY = 0;
+          let baseX = 0;
+          let baseY = 0;
+
+          const bind = () => {
+            const nextHero = document.querySelector('.hero-name');
+            if (!(nextHero instanceof HTMLElement) || nextHero === hero) return;
+            hero = nextHero;
+            hero.style.touchAction = 'pan-y';
+            hero.addEventListener('pointerdown', (event) => {
+              if (
+                event.pointerType === 'touch' ||
+                document.documentElement.classList.contains('hero-tune-mode')
+              ) return;
+              dragging = true;
+              startX = event.clientX;
+              startY = event.clientY;
+              baseX = Number.parseFloat(rootStyle.getPropertyValue('--hero-drag-x')) || 0;
+              baseY = Number.parseFloat(rootStyle.getPropertyValue('--hero-drag-y')) || 0;
+              hero.setPointerCapture?.(event.pointerId);
+              hero.style.cursor = 'grabbing';
+              event.preventDefault();
+            });
+            hero.addEventListener('pointermove', (event) => {
+              if (!dragging) return;
+              rootStyle.setProperty('--hero-drag-x', `${Math.round(baseX + event.clientX - startX)}px`);
+              rootStyle.setProperty('--hero-drag-y', `${Math.round(baseY + event.clientY - startY)}px`);
+            });
+            hero.addEventListener('pointerup', (event) => {
+              if (!dragging) return;
+              dragging = false;
+              hero.releasePointerCapture?.(event.pointerId);
+              hero.style.cursor = 'grab';
+            });
+            hero.addEventListener('pointercancel', () => {
+              dragging = false;
+              hero.style.cursor = 'grab';
+            });
+          };
+
+          bind();
+          new MutationObserver(bind).observe(document.body, { childList: true, subtree: true });
         };
 
         const installBraindanceScrubber = async () => {
@@ -2106,6 +2421,8 @@
             await loadRuntime();
             installUiSfx();
             installMobileHeroAutoLayout();
+            installMobileScrollExperience();
+            installMobileHeroDrag();
             setProgress(totalSteps, totalSteps, failed > 0 ? 'Ready (with some preload misses).' : 'Ready.');
           } catch (error) {
             console.error('[loader] failed, booting runtime directly', error);
@@ -2113,6 +2430,8 @@
             await loadRuntime();
             installUiSfx();
             installMobileHeroAutoLayout();
+            installMobileScrollExperience();
+            installMobileHeroDrag();
           }
 
           document.body.classList.remove('preload-silent');
@@ -2128,9 +2447,11 @@
     <script>
       (() => {
         const params = new URLSearchParams(window.location.search);
-        const enabled = params.get('heroTune') === '1';
-        const mobile = window.matchMedia('(max-width: 900px)').matches;
-        if (!enabled || !mobile) return;
+         const enabled = params.get('heroTune') === '1';
+         const mobile = window.matchMedia('(max-width: 900px)').matches;
+         if (!enabled || !mobile) return;
+
+         document.documentElement.classList.add('hero-tune-mode');
 
         const root = document.documentElement;
         const STORAGE_KEY = 'hero-mobile-tune-v1';
@@ -2144,10 +2465,14 @@
           if (Number.isFinite(saved.scale)) state.scale = saved.scale;
         } catch {}
 
-        const applyState = () => {
-          root.style.setProperty('--hero-mobile-x', `${state.x}px`);
-          root.style.setProperty('--hero-mobile-y', `${state.y}px`);
-          root.style.setProperty('--hero-mobile-scale', String(state.scale));
+         const applyState = () => {
+           root.style.setProperty('--hero-mobile-x', `${state.x}px`);
+           root.style.setProperty('--hero-mobile-y', `${state.y}px`);
+           root.style.setProperty('--hero-mobile-scale', String(state.scale));
+           const hero = document.querySelector('.hero-name');
+           if (hero instanceof HTMLElement) {
+             hero.style.transform = `translate3d(${state.x}px, ${state.y}px, 0) scale(${state.scale})`;
+           }
         };
 
         const saveState = () => {
@@ -2289,10 +2614,11 @@
           window.removeEventListener('pointerup', onPointerUp);
         };
 
-        const bindHeroDrag = () => {
-          const hero = findHero();
-          if (!hero || hero === activeHero) return;
-          activeHero = hero;
+         const bindHeroDrag = () => {
+           const hero = findHero();
+           if (!hero || hero === activeHero) return;
+           activeHero = hero;
+           applyState();
           const heroText = hero.closest('.hero-text');
           if (heroText instanceof HTMLElement) {
             heroText.style.pointerEvents = 'auto';
