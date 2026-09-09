@@ -140,6 +140,14 @@
     const archive = sideQuestArchives[index];
     return `
       <div class="sidequest-archive-shell" data-resume-sync="true">
+        <div class="sidequest-mobile-nav" aria-label="Browse side quests">
+          <button class="sidequest-mobile-nav-btn" type="button" data-sidequest-nav="-1" data-sidequest-current="${index}" aria-label="Previous side quest">‹</button>
+          <div class="sidequest-mobile-nav-current" aria-live="polite">
+            <span class="sidequest-mobile-nav-index">${String(index + 1).padStart(2, '0')}</span>
+            <span>${archive.title}</span>
+          </div>
+          <button class="sidequest-mobile-nav-btn" type="button" data-sidequest-nav="1" data-sidequest-current="${index}" aria-label="Next side quest">›</button>
+        </div>
         <div class="sidequest-tabs" role="tablist" aria-label="Side quest archive">
           ${sideQuestArchives.map((item, itemIndex) => `
             <button class="sidequest-tab ${itemIndex === index ? 'is-active' : ''}" type="button" role="tab" aria-selected="${itemIndex === index}" data-sidequest-index="${itemIndex}">
@@ -179,6 +187,7 @@
     setText('.profile-desc', 'Computer engineering student building mobile apps, developer tools, and AI-powered products from prototype to launch.');
     setText('.profile-body .badge', 'BUILDER - FOUNDER - SYSTEMS ENGINEER');
     setText('.timeline-panel .section-heading', 'EXPERIENCE');
+    setText('.sidequests-panel .section-heading', 'SIDEQUESTS');
 
     const feedLabel = document.querySelector('.timeline-summary .timeline-summary-title');
     if (feedLabel) feedLabel.style.display = 'none';
@@ -210,6 +219,15 @@
       questsGrid.innerHTML = renderSideQuestArchive(0);
       questsGrid.dataset.resumeSync = 'true';
       questsGrid.addEventListener('click', (event) => {
+        const navButton = event.target.closest('[data-sidequest-nav]');
+        if (navButton) {
+          const current = Number(navButton.dataset.sidequestCurrent);
+          const delta = Number(navButton.dataset.sidequestNav);
+          if (!Number.isInteger(current) || !Number.isInteger(delta)) return;
+          const index = (current + delta + sideQuestArchives.length) % sideQuestArchives.length;
+          questsGrid.innerHTML = renderSideQuestArchive(index);
+          return;
+        }
         const tab = event.target.closest('[data-sidequest-index]');
         if (!tab) return;
         const index = Number(tab.dataset.sidequestIndex);
@@ -347,6 +365,9 @@
           scrollbar-width: none;
         }
         .sidequest-tabs::-webkit-scrollbar {
+          display: none;
+        }
+        .sidequest-mobile-nav {
           display: none;
         }
         .sidequest-tab {
@@ -505,6 +526,63 @@
           .sidequest-archive-panel {
             grid-template-columns: 1fr;
             row-gap: 0.8rem;
+          }
+          .sidequest-tabs {
+            display: none;
+          }
+          .sidequest-mobile-nav {
+            display: grid;
+            grid-template-columns: 3rem minmax(0, 1fr) 3rem;
+            align-items: stretch;
+            width: 100%;
+            min-height: 3.4rem;
+            border: 1px solid rgba(0, 240, 255, 0.52);
+            background: rgba(1, 12, 20, 0.86);
+            box-shadow: 0 0 18px rgba(0, 240, 255, 0.16), inset 0 0 18px rgba(0, 240, 255, 0.06);
+          }
+          .sidequest-mobile-nav-btn {
+            border: 0;
+            border-right: 1px solid rgba(0, 240, 255, 0.4);
+            background: rgba(0, 240, 255, 0.08);
+            color: var(--cyber-yellow);
+            font-family: Orbitron, sans-serif;
+            font-size: 1.65rem;
+            line-height: 1;
+            cursor: pointer;
+          }
+          .sidequest-mobile-nav-btn:last-child {
+            border-right: 0;
+            border-left: 1px solid rgba(0, 240, 255, 0.4);
+          }
+          .sidequest-mobile-nav-btn:active {
+            background: var(--cyber-yellow);
+            color: var(--deep-black);
+          }
+          .sidequest-mobile-nav-current {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            padding: 0.55rem 0.7rem;
+            color: #c9f8ff;
+            font-family: Orbitron, sans-serif;
+            font-size: clamp(0.62rem, 2.6vw, 0.78rem);
+            font-weight: 700;
+            letter-spacing: 0.07rem;
+            text-align: center;
+            justify-content: center;
+            white-space: nowrap;
+            overflow: hidden;
+          }
+          .sidequest-mobile-nav-current > span:last-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .sidequest-mobile-nav-index {
+            flex: 0 0 auto;
+            margin-right: 0.45rem;
+            color: var(--cyber-yellow);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.64rem;
           }
           .sidequest-archive-photo {
             grid-column: 1;

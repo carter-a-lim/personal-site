@@ -1263,6 +1263,10 @@
         body.mobile-scroll-mode .contact-panel .social-row {
           justify-content: flex-start;
         }
+        body.mobile-scroll-mode .contact-panel .social-btn {
+          justify-content: center !important;
+          text-align: center !important;
+        }
       }
 
       /* Mobile-first runtime layout fixes */
@@ -1446,6 +1450,19 @@
 
         .sidequests-panel .quest-card:active {
           cursor: grabbing;
+        }
+
+        body.mobile-scroll-mode .sidequests-panel > .section-label {
+          display: none !important;
+        }
+
+        body.mobile-scroll-mode .sidequests-panel > .section-heading {
+          width: 100%;
+          margin: 0 0 1.1rem !important;
+          font-size: clamp(2rem, 10.2vw, 2.85rem) !important;
+          letter-spacing: 0.06rem !important;
+          overflow: visible;
+          white-space: nowrap;
         }
 
         /* Keep the mobile timeline compact: dates live inside each entry card. */
