@@ -234,6 +234,9 @@
       .profile-panel .section-label {
         display: none !important;
       }
+      .hud-status {
+        display: none !important;
+      }
       /* Prevent hidden timeline internals from intercepting pointer input on other scenes. */
       .timeline-panel:not(.visible),
       .timeline-panel:not(.visible) * {
@@ -1176,7 +1179,7 @@
 
         const MANIFEST_PATH = 'asset-manifest.json';
         const RUNTIME_PATH = 'app-runtime.js';
-        const CONCURRENCY = 8;
+        const CONCURRENCY = 4;
 
         const setProgress = (done, total, message) => {
           if (fill instanceof HTMLElement) {
@@ -1193,7 +1196,12 @@
             const script = document.createElement('script');
             script.type = 'module';
             script.src = RUNTIME_PATH;
-            script.onload = () => resolve();
+            script.onload = () => {
+              const sync = document.createElement('script');
+              sync.src = 'resume-site-sync.js';
+              document.body.appendChild(sync);
+              resolve();
+            };
             script.onerror = (event) => reject(event);
             document.body.appendChild(script);
           });
@@ -1833,13 +1841,18 @@
             const allAssets = Array.isArray(manifest.assets) ? manifest.assets : [];
             const assets = allAssets.filter((assetPath) => {
               if (typeof assetPath !== 'string') return false;
-              // Home-first boot: skip heavy non-home assets during preload.
+              // Home-first boot: defer large media and 3D scene assets until needed.
+              const isHeavySceneAsset =
+                /\.(bin|gltf)$/i.test(assetPath) || assetPath.includes('/textures/');
+              const isMediaAsset = /\.(mp3|mp4)$/i.test(assetPath);
               return !(
                 assetPath.includes('sidequests/') ||
                 assetPath.includes('IMG_0508') ||
                 assetPath.includes('IMG_6904') ||
                 assetPath.includes('signal-2026-02-27-164119') ||
-                assetPath.includes('vocaview-feature')
+                assetPath.includes('vocaview-feature') ||
+                isHeavySceneAsset ||
+                isMediaAsset
               );
             });
             const totalSteps = assets.length + 1;
