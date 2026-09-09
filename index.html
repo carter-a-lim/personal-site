@@ -991,6 +991,9 @@
         object-fit: cover;
         filter: brightness(0.9) contrast(1.08);
       }
+      .call-notification {
+        display: none !important;
+      }
       body.contact-active #contact-video-scene,
       body.contact-lock #contact-video-scene {
         opacity: 1;
@@ -1121,7 +1124,7 @@
         pointer-events: auto;
       }
       body.contact-active .social-row .social-btn:not(:last-child) {
-        display: none !important;
+        display: inline-flex !important;
       }
       @media (max-width: 900px) {
         #contact-video-scene video {

@@ -243,6 +243,33 @@
       achievementBlock.appendChild(resumeButton);
     }
 
+    const contactPanel = document.querySelector('.contact-panel');
+    if (contactPanel && contactPanel.dataset.resumeContactSync !== 'true') {
+      contactPanel.querySelector('.section-label')?.remove();
+      const contactCopy = contactPanel.querySelector('.section-heading + p');
+      const contactHeading = contactPanel.querySelector('.section-heading');
+      if (contactHeading) {
+        contactHeading.textContent = '';
+        contactHeading.setAttribute('aria-label', 'CONTACT');
+      }
+      if (contactCopy) {
+        contactCopy.textContent = 'Open to software engineering opportunities, product collaborations, and thoughtful conversations about building the future.';
+      }
+      const socialRow = contactPanel.querySelector('.social-row');
+      socialRow?.querySelector('a[href*="github.com"]')?.remove();
+      const emailButton = socialRow?.querySelector('a[href^="mailto:"]');
+      if (socialRow && !socialRow.querySelector('a[href*="linkedin.com/in/carter-a-lim"]')) {
+        const linkedinButton = document.createElement('a');
+        linkedinButton.className = 'social-btn';
+        linkedinButton.href = 'https://www.linkedin.com/in/carter-a-lim/';
+        linkedinButton.target = '_blank';
+        linkedinButton.rel = 'noreferrer';
+        linkedinButton.textContent = 'LINKEDIN';
+        socialRow.insertBefore(linkedinButton, emailButton || null);
+      }
+      contactPanel.dataset.resumeContactSync = 'true';
+    }
+
     if (!document.getElementById('resume-sync-styles')) {
       const style = document.createElement('style');
       style.id = 'resume-sync-styles';
