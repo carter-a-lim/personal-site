@@ -1256,19 +1256,9 @@
           pointer-events: none;
         }
         body.mobile-scroll-mode #contact-video-scene {
-          /* Mobile swaps backgrounds directly. The desktop contact transition
-             can leave a black layer over the last section on touch devices. */
-          transition: none !important;
-          background: transparent !important;
-        }
-        body.mobile-scroll-mode.contact-active .canvas-normal,
-        body.mobile-scroll-mode.contact-active .cyber-city {
-          opacity: 0.98 !important;
-          visibility: visible !important;
-        }
-        body.mobile-scroll-mode.contact-active .contact-panel {
-          opacity: 1 !important;
-          visibility: visible !important;
+          /* Desktop uses a fixed video transition. On mobile, leaving that
+             layer out preserves the native page scroll and contact content. */
+          display: none !important;
         }
         body.mobile-scroll-mode #contact-flash-overlay {
           display: none !important;
@@ -1922,7 +1912,11 @@
           const activeLabel = normalizeLabel(activeNav?.textContent || '');
           const contactPanelVisible = !!document.querySelector('.contact-panel.visible');
           const sidequestsPanelVisible = !!document.querySelector('.sidequests-panel.visible');
-          const onContact = activeLabel === 'CONTACT' || contactPanelVisible;
+          const isMobileNarrative = document.body.classList.contains('mobile-scroll-mode');
+          // Contact's video/lock sequence is desktop-only. On a phone it
+          // competes with the root scroller, so Contact stays a normal page
+          // section over the shared city background.
+          const onContact = !isMobileNarrative && (activeLabel === 'CONTACT' || contactPanelVisible);
           const onSidequests = activeLabel === 'SIDEQUESTS' || sidequestsPanelVisible;
 
           document.body.classList.toggle('contact-active', onContact);
