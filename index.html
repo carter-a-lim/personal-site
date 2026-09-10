@@ -1313,7 +1313,8 @@
           padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
           justify-content: flex-start !important;
           gap: 0.6rem;
-          height: 100dvh !important;
+          height: auto !important;
+          min-height: 0 !important;
         }
 
         .hud-top {
@@ -1383,9 +1384,17 @@
           padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
           justify-content: flex-start !important;
           align-items: stretch !important;
-          height: 100dvh !important;
-          overflow: auto;
-          -webkit-overflow-scrolling: touch;
+          /* Keep a single native scroller on #root. A nested panel scroller
+             becomes inaccessible once Contact's desktop presentation disables
+             panel pointer events. */
+          height: auto !important;
+          min-height: 100svh !important;
+          overflow: visible !important;
+          -webkit-overflow-scrolling: auto;
+        }
+
+        body.mobile-scroll-mode.contact-active .contact-panel {
+          pointer-events: auto !important;
         }
 
         .profile-layout,
