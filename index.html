@@ -1727,6 +1727,9 @@
         const hint = document.getElementById('boot-hint');
         const startButton = document.getElementById('boot-start');
         const contactVideo = document.getElementById('contact-video');
+        // The preload toggle owns one shared audio preference for both music
+        // and interface effects. Every fresh visit starts silent.
+        window.__SITE_SOUND_ENABLED__ = false;
 
         if (startButton instanceof HTMLElement) {
           startButton.remove();
@@ -1781,6 +1784,7 @@
           let lastNav = '';
 
           const canPlayNow = () => {
+            if (window.__SITE_SOUND_ENABLED__ !== true) return false;
             if (document.body.classList.contains('preload-silent')) return false;
             if (window.__PRELOAD_ALLOW_NAV__) return false;
             return true;
@@ -1822,6 +1826,9 @@
           const unlockAudio = () => {
             if (audioUnlocked) return;
             audioUnlocked = true;
+            // Do not start the short unlock samples while the site is muted.
+            // A later enabled interaction can play normally in its own gesture.
+            if (!canPlayNow()) return;
             ['nav', 'confirm', 'ui', 'activate'].forEach((key) => {
               const pool = getPool(key);
               if (!pool || !pool.list.length) return;
@@ -1888,7 +1895,8 @@
               const maybeMusic = target.closest('button');
               if (maybeMusic instanceof HTMLButtonElement) {
                 const txt = (maybeMusic.textContent || '').trim().toUpperCase();
-                if (txt.startsWith('MUSIC:')) {
+                // Keep both directions of the master sound toggle silent.
+                if (txt === 'MUSIC: OFF') {
                   play('activate');
                 }
               }
